@@ -1,0 +1,11 @@
+name = "nossalojaaqui-site"
+main = "worker.js"
+compatibility_date = "2026-08-23"
+
+[assets]
+directory = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "nossalojaaqui"
+database_id = "472d7155-7a86-465b-88a3-92bcc69c9495"
