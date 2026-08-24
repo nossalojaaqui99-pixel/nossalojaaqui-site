@@ -1,24 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Nossalojaaqui | Ofertas e Produtos</title>
+
+  <meta name="description"
+    content="Nossalojaaqui - Encontre produtos, ofertas especiais e oportunidades incríveis.">
+
+  <style>
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    header {
+      background: #111;
+      color: white;
+      padding: 18px 5%;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .logo span {
+      color: #ffcc00;
+    }
+
+    .search {
+      flex: 1;
+      max-width: 500px;
+    }
+
+    .search input {
+      width: 100%;
+      padding: 13px 18px;
+      border: none;
+      border-radius: 30px;
+      outline: none;
+      font-size: 15px;
+    }
+
+    .shipping {
+      background: #ffcc00;
+      color: #111;
+      text-align: center;
+      padding: 14px;
+      font-weight: bold;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #111, #333);
+      color: white;
+      padding: 70px 5%;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 42px;
+      margin-bottom: 15px;
+    }
+
+    .hero h1 span {
+      color: #ffcc00;
+    }
+
+    .hero p {
+      font-size: 18px;
+      margin-bottom: 28px;
+      color: #ddd;
+    }
+
+    .button {
+      display: inline-block;
+      background: #ffcc00;
+      color: #111;
+      padding: 15px 30px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: .3s;
+    }
+
+    .button:hover {
+      transform: scale(1.05);
+      background: #fff;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 45px 5%;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 30px;
+      margin-bottom: 35px;
+    }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+    }
+
+    .category {
+      background: white;
+      padding: 30px 15px;
+      border-radius: 15px;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,.07);
+    }
+
+    .category div {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 25px;
+    }
+
+    .product {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,.08);
+      transition: .3s;
+    }
+
+    .product:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,.15);
+    }
+
+    .product-image {
+      height: 230px;
+      background: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .produto-sem-imagem {
+      height: 230px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 70px;
+    }
+
+    .product-info {
+      padding: 20px;
+    }
+
+    .product h3 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .product p {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    .price {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .buy {
+      display: block;
+      text-align: center;
+      background: #111;
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .buy:hover {
+      background: #ffcc00;
+      color: #111;
+    }
+
+    .carregando,
+    .erro-produtos {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 50px 20px;
+      background: white;
+      border-radius: 15px;
+    }
+
+    .cta {
+      background: #111;
+      color: white;
+      text-align: center;
+      padding: 60px 5%;
+    }
+
+    .cta h2 {
+      font-size: 32px;
+      margin-bottom: 15px;
+    }
+
+    .cta p {
+      margin-bottom: 25px;
+      color: #ccc;
+    }
+
+    footer {
+      background: #080808;
+      color: #aaa;
+      text-align: center;
+      padding: 30px 5%;
+      line-height: 1.8;
+    }
+
+    footer strong {
+      color: white;
+    }
+
+    .whatsapp {
+      position
+      <section class="cta">
+
+  <h2>
+    Encontre sua próxima compra! 🛒
+  </h2>
+
+  <p>
+    Acesse nossa seleção de produtos e aproveite as melhores oportunidades.
+  </p>
+
+  <a
+    href="https://collshp.com/nossalojadaqui"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="button">
+
+    🚀 ACESSAR LOJA
+
+  </a>
+
+</section>
+
+
+<footer>
+
+  <p>
+    <strong>Nossalojaaqui</strong>
+  </p>
+
+  <p>
+    Sua loja online de ofertas e produtos.
+  </p>
+
+  <p>
+    ©️ 2026 Nossalojaaqui — Todos os direitos reservados.
+  </p>
+
+</footer>
+
+
+<a
+  class="whatsapp"
+  href="https://wa.me/"
+  target="_blank"
+  rel="noopener noreferrer"
+  title="Fale conosco">
+
+  💬
+
+</a>
+
+
 <script>
+
+/* =========================
+   PESQUISA
+========================= */
 
 function buscarProduto(texto) {
 
   const produtos = document.querySelectorAll(".product");
 
-  texto = texto.toLowerCase();
+  texto = texto.toLowerCase().trim();
 
   produtos.forEach(function(produto) {
 
     const nome = produto.innerText.toLowerCase();
 
     if (nome.includes(texto)) {
+
       produto.style.display = "";
+
     } else {
+
       produto.style.display = "none";
+
     }
 
   });
 
 }
+
+
+/* =========================
+   CARREGAR PRODUTOS DO D1
+========================= */
 
 async function carregarProdutos() {
 
@@ -30,78 +362,172 @@ async function carregarProdutos() {
       "https://nossalojaaqui-site.nossalojaaqui99.workers.dev/api/produtos"
     );
 
-    const dados = await resposta.json();
+    if (!resposta.ok) {
 
-    if (!dados.sucesso) {
-      throw new Error(dados.erro || "Erro ao carregar produtos");
+      throw new Error(
+        "Erro HTTP: " + resposta.status
+      );
+
     }
 
-    if (!dados.produtos || dados.produtos.length === 0) {
+    const dados = await resposta.json();
+
+    console.log("Produtos recebidos:", dados);
+
+
+    if (!dados.sucesso) {
+
+      throw new Error(
+        dados.erro || "Erro ao carregar produtos"
+      );
+
+    }
+
+
+    if (
+      !dados.produtos ||
+      dados.produtos.length === 0
+    ) {
 
       lista.innerHTML = `
+
         <div class="erro-produtos">
-          <h3>Nenhum produto encontrado.</h3>
-          <p>Novas ofertas serão adicionadas em breve.</p>
+
+          <h3>
+            Nenhum produto encontrado.
+          </h3>
+
+          <p>
+            Novas ofertas serão adicionadas em breve.
+          </p>
+
         </div>
+
       `;
 
       return;
+
     }
+
 
     lista.innerHTML = dados.produtos.map(function(produto) {
 
-      const imagem = produto.image_url
-        ? `<img src="${produto.image_url}" alt="${produto.name}" loading="lazy">`
-        : `<div class="produto-sem-imagem">🛍️</div>`;
+
+      let imagemHTML = "";
+
+
+      if (
+        produto.image_url &&
+        produto.image_url.trim() !== ""
+      ) {
+
+        imagemHTML = `
+
+          <img
+            src="${produto.image_url}"
+            alt="${produto.name}"
+            loading="lazy">
+
+        `;
+
+      } else {
+
+        imagemHTML = `
+
+          <div class="produto-sem-imagem">
+            🛍️
+          </div>
+
+        `;
+
+      }
+
 
       return `
-        <div class="product produto-real">
+
+        <div class="product">
 
           <div class="product-image">
-            ${imagem}
+
+            ${imagemHTML}
+
           </div>
+
 
           <div class="product-info">
 
-            <h3>${produto.name}</h3>
+            <h3>
+              ${produto.name || "Produto"}
+            </h3>
 
-            <p>${produto.description || ""}</p>
+
+            <p>
+              ${produto.description || ""}
+            </p>
+
 
             <div class="price">
               Confira a oferta
             </div>
 
+
             <a
-              href="${produto.shopee_url}"
+              href="${produto.shopee_url || "#"}"
               target="_blank"
               rel="noopener noreferrer"
               class="buy">
+
               🛒 COMPRAR NA SHOPEE
+
             </a>
 
           </div>
 
         </div>
+
       `;
 
     }).join("");
 
+
   } catch (erro) {
 
-    console.error("Erro ao carregar produtos:", erro);
+    console.error(
+      "Erro ao carregar produtos:",
+      erro
+    );
+
 
     lista.innerHTML = `
+
       <div class="erro-produtos">
-        <h3>Não foi possível carregar as ofertas.</h3>
-        <p>Tente atualizar a página.</p>
+
+        <h3>
+          ⚠️ Não foi possível carregar as ofertas.
+        </h3>
+
+        <p>
+          Tente atualizar a página.
+        </p>
+
       </div>
+
     `;
+
   }
+
 }
+
+
+/* =========================
+   INICIAR
+========================= */
 
 carregarProdutos();
 
 </script>
 
+
 </body>
+
 </html>
