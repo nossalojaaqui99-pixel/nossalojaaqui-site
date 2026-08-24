@@ -264,9 +264,155 @@
     }
 
     .whatsapp {
-      position
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 60px;
+      height: 60px;
+      background: #25D366;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 28px;
+      box-shadow: 0 5px 20px rgba(0,0,0,.25);
+      z-index: 999;
+    }
 
-     <section class="cta">
+    @media (max-width: 700px) {
+
+      .header-content {
+        flex-direction: column;
+      }
+
+      .search {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .hero {
+        padding: 50px 5%;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .products {
+        grid-template-columns: 1fr;
+      }
+
+    }
+
+  </style>
+  </head>
+
+<body>
+
+<header>
+
+  <div class="header-content">
+
+    <div class="logo">
+      Nossa<span>lojaaqui</span>
+    </div>
+
+    <div class="search">
+
+      <input
+        type="search"
+        placeholder="🔎 O que você está procurando?"
+        onkeyup="buscarProduto(this.value)">
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<div class="shipping">
+
+  🚚 OFERTAS ESPECIAIS • FRETE GRÁTIS EM PRODUTOS SELECIONADOS
+
+</div>
+
+
+<section class="hero">
+
+  <h1>
+    Bem-vindo à <span>Nossalojaaqui</span>
+  </h1>
+
+  <p>
+    Produtos incríveis, ofertas especiais e oportunidades para você.
+  </p>
+
+  <a href="#produtos" class="button">
+    🛍️ VER OFERTAS
+  </a>
+
+</section>
+
+
+<section class="container">
+
+  <h2 class="section-title">
+    🛍️ Compre por categoria
+  </h2>
+
+  <div class="categories">
+
+    <div class="category">
+      <div>💄</div>
+      Beleza
+    </div>
+
+    <div class="category">
+      <div>🌸</div>
+      Perfumes
+    </div>
+
+    <div class="category">
+      <div>🏠</div>
+      Casa
+    </div>
+
+    <div class="category">
+      <div>📱</div>
+      Tecnologia
+    </div>
+
+    <div class="category">
+      <div>🎁</div>
+      Ofertas
+    </div>
+
+  </div>
+
+</section>
+
+
+<section class="container" id="produtos">
+
+  <h2 class="section-title">
+    🔥 Ofertas em destaque
+  </h2>
+
+  <div class="products" id="lista-produtos">
+
+    <div class="carregando">
+      ⏳ Carregando ofertas...
+    </div>
+
+  </div>
+
+</section>
+
+
+<section class="cta">
 
   <h2>
     Encontre sua próxima compra! 🛒
@@ -287,8 +433,6 @@
   </a>
 
 </section>
-
-
 <footer>
 
   <p>
@@ -320,10 +464,6 @@
 
 <script>
 
-/* =========================
-   PESQUISA
-========================= */
-
 function buscarProduto(texto) {
 
   const produtos = document.querySelectorAll(".product");
@@ -348,10 +488,6 @@ function buscarProduto(texto) {
 
 }
 
-
-/* =========================
-   CARREGAR PRODUTOS DO D1
-========================= */
 
 async function carregarProdutos() {
 
@@ -385,10 +521,7 @@ async function carregarProdutos() {
     }
 
 
-    if (
-      !dados.produtos ||
-      dados.produtos.length === 0
-    ) {
+    if (!dados.produtos || dados.produtos.length === 0) {
 
       lista.innerHTML = `
 
@@ -412,7 +545,6 @@ async function carregarProdutos() {
 
 
     lista.innerHTML = dados.produtos.map(function(produto) {
-
 
       let imagemHTML = "";
 
@@ -520,10 +652,6 @@ async function carregarProdutos() {
 }
 
 
-/* =========================
-   INICIAR
-========================= */
-
 carregarProdutos();
 
 </script>
@@ -532,11 +660,3 @@ carregarProdutos();
 </body>
 
 </html>
-
- carregarProdutos();
-
-</script>
-
-</body>
-
-</html>         
