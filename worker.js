@@ -28,3 +28,5 @@ export default {
     });
   }
 };
+if (url.pathname === "/api/produtos") {
+  FROM products
