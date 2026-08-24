@@ -5,19 +5,35 @@ export default {
     if (url.pathname === "/api/produtos") {
       try {
         const result = await env.DB
-          .prepare("SELECT * FROM produtos ORDER BY id DESC")
+          .prepare("SELECT * FROM products ORDER BY id DESC")
           .all();
 
-        return Response.json({
-          sucesso: true,
-          produtos: result.results
-        });
+        return new Response(
+          JSON.stringify({
+            sucesso: true,
+            produtos: result.results
+          }),
+          {
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+              "Access-Control-Allow-Origin": "*"
+            }
+          }
+        );
 
       } catch (error) {
-        return Response.json({
-          sucesso: false,
-          erro: error.message
-        }, { status: 500 });
+        return new Response(
+          JSON.stringify({
+            sucesso: false,
+            erro: error.message
+          }),
+          {
+            status: 500,
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8"
+            }
+          }
+        );
       }
     }
 
@@ -28,5 +44,3 @@ export default {
     });
   }
 };
-if (url.pathname === "/api/produtos") {
-  FROM products
