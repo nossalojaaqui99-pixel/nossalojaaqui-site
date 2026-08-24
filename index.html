@@ -1,539 +1,3 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Nossalojaaqui | Ofertas e Produtos</title>
-
-  <meta name="description"
-    content="Nossalojaaqui - Encontre produtos, ofertas especiais e oportunidades incríveis. Compre online com segurança e praticidade.">
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    body {
-      background: #f5f5f5;
-      color: #222;
-    }
-
-    header {
-      background: #111;
-      color: white;
-      padding: 18px 5%;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    .header-content {
-      max-width: 1200px;
-      margin: auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .logo {
-      font-size: 25px;
-      font-weight: bold;
-      white-space: nowrap;
-    }
-
-    .logo span {
-      color: #ffcc00;
-    }
-
-    .search {
-      flex: 1;
-      max-width: 500px;
-    }
-
-    .search input {
-      width: 100%;
-      padding: 13px 18px;
-      border: none;
-      border-radius: 30px;
-      outline: none;
-      font-size: 15px;
-    }
-
-    .hero {
-      background: linear-gradient(135deg, #111, #333);
-      color: white;
-      padding: 70px 5%;
-      text-align: center;
-    }
-
-    .hero h1 {
-      font-size: 42px;
-      margin-bottom: 15px;
-    }
-
-    .hero h1 span {
-      color: #ffcc00;
-    }
-
-    .hero p {
-      font-size: 18px;
-      margin-bottom: 28px;
-      color: #ddd;
-    }
-
-    .button {
-      display: inline-block;
-      background: #ffcc00;
-      color: #111;
-      padding: 15px 30px;
-      border-radius: 30px;
-      text-decoration: none;
-      font-weight: bold;
-      transition: .3s;
-    }
-
-    .button:hover {
-      transform: scale(1.05);
-      background: #fff;
-    }
-
-    .shipping {
-      background: #ffcc00;
-      color: #111;
-      text-align: center;
-      padding: 14px;
-      font-weight: bold;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: auto;
-      padding: 45px 5%;
-    }
-
-    .section-title {
-      text-align: center;
-      font-size: 30px;
-      margin-bottom: 35px;
-    }
-
-    .products {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 25px;
-    }
-
-    .product {
-      background: white;
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,.08);
-      transition: .3s;
-    }
-
-    .product:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(0,0,0,.15);
-    }
-
-    .product-image {
-      height: 230px;
-      background: #eee;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 70px;
-    }
-
-    .product-info {
-      padding: 20px;
-    }
-
-    .product h3 {
-      margin-bottom: 10px;
-      font-size: 18px;
-    }
-
-    .product p {
-      color: #666;
-      font-size: 14px;
-      line-height: 1.5;
-      margin-bottom: 15px;
-    }
-
-    .price {
-      font-size: 22px;
-      font-weight: bold;
-      margin-bottom: 15px;
-    }
-
-    .buy {
-      display: block;
-      text-align: center;
-      background: #111;
-      color: white;
-      padding: 12px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .buy:hover {
-      background: #ffcc00;
-      color: #111;
-    }
-
-    .categories {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 20px;
-    }
-
-    .category {
-      background: white;
-      padding: 30px 15px;
-      border-radius: 15px;
-      text-align: center;
-      font-weight: bold;
-      box-shadow: 0 4px 12px rgba(0,0,0,.07);
-    }
-
-    .category div {
-      font-size: 40px;
-      margin-bottom: 10px;
-    }
-
-    .cta {
-      background: #111;
-      color: white;
-      text-align: center;
-      padding: 60px 5%;
-    }
-
-    .cta h2 {
-      font-size: 32px;
-      margin-bottom: 15px;
-    }
-
-    .cta p {
-      margin-bottom: 25px;
-      color: #ccc;
-    }
-
-    footer {
-      background: #080808;
-      color: #aaa;
-      text-align: center;
-      padding: 30px 5%;
-      line-height: 1.8;
-    }
-
-    footer strong {
-      color: white;
-    }
-
-    .whatsapp {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      width: 60px;
-      height: 60px;
-      background: #25D366;
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      font-size: 28px;
-      box-shadow: 0 5px 20px rgba(0,0,0,.25);
-      z-index: 999;
-    }
-
-    @media (max-width: 700px) {
-
-      .header-content {
-        flex-direction: column;
-      }
-
-      .search {
-        width: 100%;
-      }
-
-      .hero {
-        padding: 50px 5%;
-      }
-
-      .hero h1 {
-        font-size: 32px;
-      }
-
-      .hero p {
-        font-size: 16px;
-      }
-
-      .section-title {
-        font-size: 25px;
-      }
-    }
-  </style>
-</head>
-
-<body>
-
-<header>
-  <div class="header-content">
-
-    <div class="logo">
-      Nossa<span>lojaaqui</span>
-    </div>
-
-    <div class="search">
-      <input
-        type="search"
-        placeholder="🔎 O que você está procurando?"
-        onkeyup="buscarProduto(this.value)">
-    </div>
-
-  </div>
-</header>
-
-<div class="shipping">
-  🚚 OFERTAS ESPECIAIS • FRETE GRÁTIS EM PRODUTOS SELECIONADOS
-</div>
-
-<section class="hero">
-
-  <h1>
-    Bem-vindo à <span>Nossalojaaqui</span>
-  </h1>
-
-  <p>
-    Produtos incríveis, ofertas especiais e oportunidades para você.
-  </p>
-
-  <a href="#produtos" class="button">
-    🛍️ VER OFERTAS
-  </a>
-
-</section>
-
-<section class="container">
-
-  <h2 class="section-title">
-    🛍️ Compre por categoria
-  </h2>
-
-  <div class="categories">
-
-    <div class="category">
-      <div>💄</div>
-      Beleza
-    </div>
-
-    <div class="category">
-      <div>🌸</div>
-      Perfumes
-    </div>
-
-    <div class="category">
-      <div>🏠</div>
-      Casa
-    </div>
-
-    <div class="category">
-      <div>📱</div>
-      Tecnologia
-    </div>
-
-    <div class="category">
-      <div>🎁</div>
-      Ofertas
-    </div>
-
-  </div>
-
-</section>
-
-<section class="container" id="produtos">
-
-  <h2 class="section-title">
-    🔥 Ofertas em destaque
-  </h2>
-
-  <div class="products">
-
-    <div class="product">
-
-      <div class="product-image">
-        🧴
-      </div>
-
-      <div class="product-info">
-
-        <h3>Perfumes e Fragrâncias</h3>
-
-        <p>
-          Encontre fragrâncias incríveis para todos os momentos.
-        </p>
-
-        <div class="price">
-          Confira a oferta
-        </div>
-
-        <a
-          href="https://collshp.com/nossalojadaqui"
-          target="_blank"
-          class="buy">
-          VER PRODUTOS
-        </a>
-
-      </div>
-
-    </div>
-
-
-    <div class="product">
-
-      <div class="product-image">
-        🥤
-      </div>
-
-      <div class="product-info">
-
-        <h3>Copos e Garrafas</h3>
-
-        <p>
-          Produtos modernos para acompanhar sua rotina.
-        </p>
-
-        <div class="price">
-          Ofertas especiais
-        </div>
-
-        <a
-          href="https://collshp.com/nossalojadaqui"
-          target="_blank"
-          class="buy">
-          COMPRAR
-        </a>
-
-      </div>
-
-    </div>
-
-
-    <div class="product">
-
-      <div class="product-image">
-        📱
-      </div>
-
-      <div class="product-info">
-
-        <h3>Acessórios e Tecnologia</h3>
-
-        <p>
-          Produtos úteis e acessórios para o seu dia a dia.
-        </p>
-
-        <div class="price">
-          Confira
-        </div>
-
-        <a
-          href="https://collshp.com/nossalojadaqui"
-          target="_blank"
-          class="buy">
-          VER OFERTAS
-        </a>
-
-      </div>
-
-    </div>
-
-
-    <div class="product">
-
-      <div class="product-image">
-        🏠
-      </div>
-
-      <div class="product-info">
-
-        <h3>Casa e Utilidades</h3>
-
-        <p>
-          Produtos para deixar sua casa mais prática.
-        </p>
-
-        <div class="price">
-          Ofertas especiais
-        </div>
-
-        <a
-          href="https://collshp.com/nossalojadaqui"
-          target="_blank"
-          class="buy">
-          COMPRAR
-        </a>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</section>
-
-<section class="cta">
-
-  <h2>
-    Encontre sua próxima compra! 🛒
-  </h2>
-
-  <p>
-    Acesse nossa seleção de produtos e aproveite as melhores oportunidades.
-  </p>
-
-  <a
-    href="https://collshp.com/nossalojadaqui"
-    target="_blank"
-    class="button">
-    🚀 ACESSAR LOJA
-  </a>
-
-</section>
-
-<footer>
-
-  <p>
-    <strong>Nossalojaaqui</strong>
-  </p>
-
-  <p>
-    Sua loja online de ofertas e produtos.
-  </p>
-
-  <p>
-    © 2026 Nossalojaaqui — Todos os direitos reservados.
-  </p>
-
-</footer>
-
-<a
-  class="whatsapp"
-  href="https://wa.me/"
-  target="_blank"
-  title="Fale conosco">
-  💬
-</a>
-
 <script>
 
 function buscarProduto(texto) {
@@ -556,57 +20,88 @@ function buscarProduto(texto) {
 
 }
 
-</script>
-
-</body>
-</html>
-<script>
 async function carregarProdutos() {
+
+  const lista = document.getElementById("lista-produtos");
+
   try {
-    const resposta = await fetch("/api/produtos");
+
+    const resposta = await fetch(
+      "https://nossalojaaqui-site.nossalojaaqui99.workers.dev/api/produtos"
+    );
+
     const dados = await resposta.json();
 
     if (!dados.sucesso) {
-      console.error("Erro:", dados.erro);
+      throw new Error(dados.erro || "Erro ao carregar produtos");
+    }
+
+    if (!dados.produtos || dados.produtos.length === 0) {
+
+      lista.innerHTML = `
+        <div class="erro-produtos">
+          <h3>Nenhum produto encontrado.</h3>
+          <p>Novas ofertas serão adicionadas em breve.</p>
+        </div>
+      `;
+
       return;
     }
 
-    const produtos = dados.produtos;
+    lista.innerHTML = dados.produtos.map(function(produto) {
 
-    // Procura uma área de produtos existente
-    const area = document.querySelector("#produtos");
+      const imagem = produto.image_url
+        ? `<img src="${produto.image_url}" alt="${produto.name}" loading="lazy">`
+        : `<div class="produto-sem-imagem">🛍️</div>`;
 
-    if (!area) {
-      console.warn("Crie um elemento com id='produtos' no HTML.");
-      return;
-    }
+      return `
+        <div class="product produto-real">
 
-    area.innerHTML = produtos.map(produto => `
-      <div class="produto-card">
-        ${
-          produto.image_url
-            ? `<img src="${produto.image_url}" alt="${produto.name}">`
-            : `<div class="produto-sem-imagem">🛍️</div>`
-        }
+          <div class="product-image">
+            ${imagem}
+          </div>
 
-        <h3>${produto.name}</h3>
+          <div class="product-info">
 
-        <p>${produto.description || ""}</p>
+            <h3>${produto.name}</h3>
 
-        <a
-          href="${produto.shopee_url}"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="botao-comprar">
-          🛒 Comprar na Shopee
-        </a>
-      </div>
-    `).join("");
+            <p>${produto.description || ""}</p>
+
+            <div class="price">
+              Confira a oferta
+            </div>
+
+            <a
+              href="${produto.shopee_url}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="buy">
+              🛒 COMPRAR NA SHOPEE
+            </a>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
 
   } catch (erro) {
+
     console.error("Erro ao carregar produtos:", erro);
+
+    lista.innerHTML = `
+      <div class="erro-produtos">
+        <h3>Não foi possível carregar as ofertas.</h3>
+        <p>Tente atualizar a página.</p>
+      </div>
+    `;
   }
 }
 
 carregarProdutos();
+
 </script>
+
+</body>
+</html>
