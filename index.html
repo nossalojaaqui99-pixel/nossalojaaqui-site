@@ -560,3 +560,53 @@ function buscarProduto(texto) {
 
 </body>
 </html>
+<script>
+async function carregarProdutos() {
+  try {
+    const resposta = await fetch("/api/produtos");
+    const dados = await resposta.json();
+
+    if (!dados.sucesso) {
+      console.error("Erro:", dados.erro);
+      return;
+    }
+
+    const produtos = dados.produtos;
+
+    // Procura uma área de produtos existente
+    const area = document.querySelector("#produtos");
+
+    if (!area) {
+      console.warn("Crie um elemento com id='produtos' no HTML.");
+      return;
+    }
+
+    area.innerHTML = produtos.map(produto => `
+      <div class="produto-card">
+        ${
+          produto.image_url
+            ? `<img src="${produto.image_url}" alt="${produto.name}">`
+            : `<div class="produto-sem-imagem">🛍️</div>`
+        }
+
+        <h3>${produto.name}</h3>
+
+        <p>${produto.description || ""}</p>
+
+        <a
+          href="${produto.shopee_url}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="botao-comprar">
+          🛒 Comprar na Shopee
+        </a>
+      </div>
+    `).join("");
+
+  } catch (erro) {
+    console.error("Erro ao carregar produtos:", erro);
+  }
+}
+
+carregarProdutos();
+</script>
