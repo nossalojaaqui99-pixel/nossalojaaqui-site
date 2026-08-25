@@ -1,9 +1,13 @@
-export default {
+var worker_default = {
   async fetch(request, env) {
+
     const url = new URL(request.url);
 
+    // API DE PRODUTOS
     if (url.pathname === "/api/produtos") {
+
       try {
+
         const result = await env.DB
           .prepare("SELECT * FROM products ORDER BY id DESC")
           .all();
@@ -22,6 +26,7 @@ export default {
         );
 
       } catch (error) {
+
         return new Response(
           JSON.stringify({
             sucesso: false,
@@ -34,13 +39,16 @@ export default {
             }
           }
         );
+
       }
     }
 
-    return new Response("Nossalojaaqui", {
-      headers: {
-        "Content-Type": "text/plain; charset=UTF-8"
-      }
-    });
+    // ENTREGA O SITE PELOS ASSETS
+    return env.ASSETS.fetch(request);
+
   }
+};
+
+export {
+  worker_default as default
 };
