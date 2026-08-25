@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Painel do Lojista | Nossalojaaqui</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #f5f5f5;
+      color: #222;
+      padding: 30px 15px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+    }
+
+    .painel {
+      background: white;
+      padding: 30px;
+      border-radius: 18px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.10);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .subtitulo {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 18px;
+      margin-bottom: 7px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    input[type="file"] {
+      background: #fafafa;
+      padding: 12px;
+    }
+
+    #preview {
+      display: none;
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      margin-top: 15px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 16px;
+      border: 0;
+      border-radius: 12px;
+      background: #ffd900;
+      color: #222;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #f0c900;
+    }
+
+    #mensagem {
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .voltar {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #333;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="painel">
+
+    <h1>⚙️ Painel do lojista</h1>
+
+    <p class="subtitulo">
+      Adicionar produto ao Nossalojaaqui
+    </p>
+
+    <label>Nome do produto</label>
+
+    <input
+      type="text"
+      id="nome"
+      placeholder="Ex.: Relógio Digital"
+    >
+
+    <label>Preço</label>
+
+    <input
+      type="text"
+      id="preco"
+      placeholder="Ex.: 39,90"
+    >
+
+    <label>Categoria</label>
+
+    <select id="categoria">
+
+      <option value="">
+        Selecione uma categoria
+      </option>
+
+      <option value="Beleza">
+        💄 Beleza
+      </option>
+
+      <option value="Perfumes">
+        🌸 Perfumes
+      </option>
+
+      <option value="Casa">
+        🏠 Casa
+      </option>
+
+      <option value="Tecnologia">
+        📱 Tecnologia
+      </option>
+
+      <option value="Outros">
+        🎁 Outros
+      </option>
+
+    </select>
+
+    <label>📷 Foto do produto</label>
+
+    <input
+      type="file"
+      id="foto"
+      accept="image/*"
+    >
+
+    <img id="preview" alt="Prévia do produto">
+
+    <label>🔗 Link do produto</label>
+
+    <input
+      type="url"
+      id="link"
+      placeholder="https://..."
+    >
+
+    <label>📝 Descrição</label>
+
+    <textarea
+      id="descricao"
+      placeholder="Descrição do produto..."
+    ></textarea>
+
+    <button onclick="salvarProduto()">
+      💾 SALVAR PRODUTO
+    </button>
+
+    <div id="mensagem"></div>
+
+    <a class="voltar" href="/">
+      ← Voltar para o site
+    </a>
+
+  </div>
+
+</div>
+
+<script>
+
+const fotoInput = document.getElementById("foto");
+const preview = document.getElementById("preview");
+
+fotoInput.addEventListener("change", function() {
+
+  const arquivo = this.files[0];
+
+  if (!arquivo) {
+    preview.style.display = "none";
+    return;
+  }
+
+  const leitor = new FileReader();
+
+  leitor.onload = function(e) {
+
+    preview.src = e.target.result;
+    preview.style.display = "block";
+
+  };
+
+  leitor.readAsDataURL(arquivo);
+
+});
+
+
+async function salvarProduto() {
+
+  const mensagem = document.getElementById("mensagem");
+
+  const nome =
+    document.getElementById("nome").value.trim();
+
+  const preco =
+    document.getElementById("preco").value.trim();
+
+  const categoria =
+    document.getElementById("categoria").value;
+
+  const link =
+    document.getElementById("link").value.trim();
+
+  const descricao =
+    document.getElementById("descricao").value.trim();
+
+  const arquivo =
+    document.getElementById("foto").files[0];
+
+
+  if (!nome ||
+      !preco ||
+      !categoria ||
+      !link ||
+      !descricao ||
+      !arquivo) {
+
+    mensagem.style.color = "red";
+
+    mensagem.innerText =
+      "⚠️ Preencha todos os campos e escolha uma foto.";
+
+    return;
+  }
+
+
+  mensagem.style.color = "#555";
+
+  mensagem.innerText =
+    "⏳ Salvando produto...";
+
+
+  const leitor = new FileReader();
+
+
+  leitor.onload = async function() {
+
+    try {
+
+      const imagem = leitor.result;
+
+
+      const resposta = await fetch("/api/produtos", {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+
+          name: nome,
+
+          price: preco,
+
+          category: categoria,
+
+          image_url: imagem,
+
+          shopee_url: link,
+
+          description: descricao
+
+        })
+
+      });
+
+
+      const resultado =
+        await resposta.json();
+
+
+      if (!resposta.ok ||
+          resultado.sucesso === false) {
+
+        throw new Error(
+          resultado.erro ||
+          "Não foi possível salvar."
+        );
+
+      }
+
+
+      mensagem.style.color = "green";
+
+      mensagem.innerText =
+        "✅ Produto salvo com sucesso!";
+
+
+      document.getElementById("nome").value = "";
+
+      document.getElementById("preco").value = "";
+
+      document.getElementById("categoria").value = "";
+
+      document.getElementById("link").value = "";
+
+      document.getElementById("descricao").value = "";
+
+      document.getElementById("foto").value = "";
+
+      preview.src = "";
+
+      preview.style.display = "none";
+
+
+    } catch (erro) {
+
+      mensagem.style.color = "red";
+
+      mensagem.innerText =
+        "❌ Erro: " + erro.message;
+
+    }
+
+  };
+
+
+  leitor.readAsDataURL(arquivo);
+
+}
+
+</script>
+
+</body>
+</html>
