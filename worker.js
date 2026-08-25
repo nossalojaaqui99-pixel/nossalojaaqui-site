@@ -11,7 +11,6 @@ export default {
       url.pathname === "/api/produtos" &&
       request.method === "GET"
     ) {
-
       try {
 
         const result = await env.DB
@@ -53,7 +52,6 @@ export default {
         );
 
       }
-
     }
 
 
@@ -65,7 +63,6 @@ export default {
       url.pathname === "/api/produtos" &&
       request.method === "POST"
     ) {
-
       try {
 
         const dados = await request.json();
@@ -95,7 +92,7 @@ export default {
           dados.sizes || "";
 
 
-        // Verificação mínima
+        // Somente estes campos são obrigatórios
 
         if (
           !nome ||
@@ -108,7 +105,7 @@ export default {
             JSON.stringify({
               sucesso: false,
               erro:
-                "Nome, preço, categoria e link são obrigatórios."
+                "Preencha nome, preço, categoria e link da Shopee."
             }),
             {
               status: 400,
@@ -124,7 +121,9 @@ export default {
         }
 
 
-        // Inserir no D1
+        // =========================================
+        // GRAVAR NO D1
+        // =========================================
 
         await env.DB
           .prepare(`
@@ -191,18 +190,15 @@ export default {
         );
 
       }
-
     }
 
 
     // =========================================
-    // SITE
+    // SITE / ARQUIVOS
     // =========================================
 
     if (env.ASSETS) {
-
       return env.ASSETS.fetch(request);
-
     }
 
 
