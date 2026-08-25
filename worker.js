@@ -3,9 +3,9 @@ export default {
 
     const url = new URL(request.url);
 
-    // =========================
-    // API - LISTAR PRODUTOS
-    // =========================
+    // =========================================
+    // LISTAR PRODUTOS
+    // =========================================
 
     if (
       url.pathname === "/api/produtos" &&
@@ -28,6 +28,7 @@ export default {
             produtos: result.results
           }),
           {
+            status: 200,
             headers: {
               "Content-Type": "application/json; charset=UTF-8",
               "Access-Control-Allow-Origin": "*"
@@ -56,9 +57,9 @@ export default {
     }
 
 
-    // =========================
-    // API - SALVAR PRODUTO
-    // =========================
+    // =========================================
+    // SALVAR PRODUTO
+    // =========================================
 
     if (
       url.pathname === "/api/produtos" &&
@@ -69,33 +70,53 @@ export default {
 
         const dados = await request.json();
 
-        const nome = dados.name || "";
-        const preco = dados.price || "";
-        const categoria = dados.category || "";
-        const imagem = dados.image_url || "";
-        const link = dados.shopee_url || "";
-        const descricao = dados.description || "";
+        const nome =
+          dados.name || "";
 
+        const preco =
+          dados.price || "";
+
+        const categoria =
+          dados.category || "";
+
+        const imagem =
+          dados.image_url || "";
+
+        const link =
+          dados.shopee_url || "";
+
+        const descricao =
+          dados.description || "";
+
+        const cores =
+          dados.colors || "";
+
+        const tamanhos =
+          dados.sizes || "";
+
+
+        // Verificação mínima
 
         if (
           !nome ||
           !preco ||
           !categoria ||
-          !imagem ||
-          !link ||
-          !descricao
+          !link
         ) {
 
           return new Response(
             JSON.stringify({
               sucesso: false,
-              erro: "Preencha todos os campos."
+              erro:
+                "Nome, preço, categoria e link são obrigatórios."
             }),
             {
               status: 400,
               headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-                "Access-Control-Allow-Origin": "*"
+                "Content-Type":
+                  "application/json; charset=UTF-8",
+                "Access-Control-Allow-Origin":
+                  "*"
               }
             }
           );
@@ -103,26 +124,32 @@ export default {
         }
 
 
+        // Inserir no D1
+
         await env.DB
           .prepare(`
             INSERT INTO products
             (
               name,
-              price,
-              category,
+              description,
               image_url,
               shopee_url,
-              description
+              price,
+              category,
+              colors,
+              sizes
             )
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
           `)
           .bind(
             nome,
-            preco,
-            categoria,
+            descricao,
             imagem,
             link,
-            descricao
+            preco,
+            categoria,
+            cores,
+            tamanhos
           )
           .run();
 
@@ -130,13 +157,16 @@ export default {
         return new Response(
           JSON.stringify({
             sucesso: true,
-            mensagem: "Produto salvo com sucesso!"
+            mensagem:
+              "Produto salvo com sucesso!"
           }),
           {
             status: 200,
             headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-              "Access-Control-Allow-Origin": "*"
+              "Content-Type":
+                "application/json; charset=UTF-8",
+              "Access-Control-Allow-Origin":
+                "*"
             }
           }
         );
@@ -152,8 +182,10 @@ export default {
           {
             status: 500,
             headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-              "Access-Control-Allow-Origin": "*"
+              "Content-Type":
+                "application/json; charset=UTF-8",
+              "Access-Control-Allow-Origin":
+                "*"
             }
           }
         );
@@ -163,11 +195,27 @@ export default {
     }
 
 
-    // =========================
-    // ENTREGA O SITE
-    // =========================
+    // =========================================
+    // SITE
+    // =========================================
 
-    return env.ASSETS.fetch(request);
+    if (env.ASSETS) {
+
+      return env.ASSETS.fetch(request);
+
+    }
+
+
+    return new Response(
+      "Catálogo Nossalojaaqui",
+      {
+        status: 200,
+        headers: {
+          "Content-Type":
+            "text/html; charset=UTF-8"
+        }
+      }
+    );
 
   }
 };
