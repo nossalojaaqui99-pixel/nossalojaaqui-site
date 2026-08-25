@@ -105,6 +105,8 @@
       text-decoration: none;
       font-weight: bold;
       transition: .3s;
+      border: none;
+      cursor: pointer;
     }
 
     .button:hover {
@@ -124,6 +126,8 @@
       margin-bottom: 35px;
     }
 
+    /* CATEGORIAS */
+
     .categories {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -137,12 +141,28 @@
       text-align: center;
       font-weight: bold;
       box-shadow: 0 4px 12px rgba(0,0,0,.07);
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: .3s;
+      font-size: 16px;
+    }
+
+    .category:hover {
+      transform: translateY(-5px);
+      border-color: #ffcc00;
+    }
+
+    .category.ativa {
+      background: #ffcc00;
+      border-color: #ffcc00;
     }
 
     .category div {
       font-size: 40px;
       margin-bottom: 10px;
     }
+
+    /* PRODUTOS */
 
     .products {
       display: grid;
@@ -307,7 +327,8 @@
     }
 
   </style>
-  </head>
+
+</head>
 
 <body>
 
@@ -323,8 +344,10 @@
 
       <input
         type="search"
+        id="campoBusca"
         placeholder="🔎 O que você está procurando?"
-        onkeyup="buscarProduto(this.value)">
+        oninput="buscarProduto(this.value)"
+      >
 
     </div>
 
@@ -363,32 +386,55 @@
     🛍️ Compre por categoria
   </h2>
 
+
   <div class="categories">
 
-    <div class="category">
+    <button
+      class="category ativa"
+      onclick="mostrarTodos(this)">
+      <div>🛍️</div>
+      Todos
+    </button>
+
+
+    <button
+      class="category"
+      onclick="filtrarCategoria('Beleza', this)">
       <div>💄</div>
       Beleza
-    </div>
+    </button>
 
-    <div class="category">
+
+    <button
+      class="category"
+      onclick="filtrarCategoria('Perfumes', this)">
       <div>🌸</div>
       Perfumes
-    </div>
+    </button>
 
-    <div class="category">
+
+    <button
+      class="category"
+      onclick="filtrarCategoria('Casa', this)">
       <div>🏠</div>
       Casa
-    </div>
+    </button>
 
-    <div class="category">
+
+    <button
+      class="category"
+      onclick="filtrarCategoria('Tecnologia', this)">
       <div>📱</div>
       Tecnologia
-    </div>
+    </button>
 
-    <div class="category">
+
+    <button
+      class="category"
+      onclick="filtrarCategoria('Ofertas', this)">
       <div>🎁</div>
       Ofertas
-    </div>
+    </button>
 
   </div>
 
@@ -400,6 +446,7 @@
   <h2 class="section-title">
     🔥 Ofertas em destaque
   </h2>
+
 
   <div class="products" id="lista-produtos">
 
@@ -433,6 +480,8 @@
   </a>
 
 </section>
+
+
 <footer>
 
   <p>
@@ -464,40 +513,32 @@
 
 <script>
 
-function buscarProduto(texto) {
+let todosProdutos = [];
 
-  const produtos = document.querySelectorAll(".product");
+let categoriaAtual = "Todos";
 
-  texto = texto.toLowerCase().trim();
 
-  produtos.forEach(function(produto) {
-
-    const nome = produto.innerText.toLowerCase();
-
-    if (nome.includes(texto)) {
-
-      produto.style.display = "";
-
-    } else {
-
-      produto.style.display = "none";
-
-    }
-
-  });
-
-}
-
+/* =========================
+   CARREGAR PRODUTOS
+========================= */
 
 async function carregarProdutos() {
 
-  const lista = document.getElementById("lista-produtos");
+  const lista =
+    document.getElementById("lista-produtos");
+
+  lista.innerHTML = `
+    <div class="carregando">
+      ⏳ Carregando ofertas...
+    </div>
+  `;
+
 
   try {
 
-    const resposta = await fetch(
-      "https://nossalojaaqui-site.nossalojaaqui99.workers.dev/api/produtos"
-    );
+    const resposta =
+      await fetch("/api/produtos");
+
 
     if (!resposta.ok) {
 
@@ -507,70 +548,139 @@ async function carregarProdutos() {
 
     }
 
-    const dados = await resposta.json();
 
-    console.log("Produtos recebidos:", dados);
+    const dados =
+      await resposta.json();
+
+
+    console.log(
+      "Produtos recebidos:",
+      dados
+    );
 
 
     if (!dados.sucesso) {
 
       throw new Error(
-        dados.erro || "Erro ao carregar produtos"
+        dados.erro ||
+        "Erro ao carregar produtos"
       );
 
     }
 
 
-    if (!dados.produtos || dados.produtos.length === 0) {
-
-      lista.innerHTML = `
-
-        <div class="erro-produtos">
-
-          <h3>
-            Nenhum produto encontrado.
-          </h3>
-
-          <p>
-            Novas ofertas serão adicionadas em breve.
-          </p>
-
-        </div>
-
-      `;
-
-      return;
-
-    }
+    todosProdutos =
+      dados.produtos || [];
 
 
-    lista.innerHTML = dados.produtos.map(function(produto) {
+    mostrarProdutos(
+      todosProdutos
+    );
 
-      let imagemHTML = "";
+
+  } catch (erro) {
+
+    console.error(
+      "Erro:",
+      erro
+    );
 
 
-      if (
-        produto.image_url &&
-        produto.image_url.trim() !== ""
-      ) {
+    lista.innerHTML = `
+      <div class="erro-produtos">
+
+        <h3>
+          ⚠️ Não foi possível carregar as ofertas.
+        </h3>
+
+        <p>
+          Tente atualizar a página.
+        </p>
+
+      </div>
+    `;
+
+  }
+
+}
+
+
+/* =========================
+   MOSTRAR PRODUTOS
+========================= */
+
+function mostrarProdutos(produtos) {
+
+  const lista =
+    document.getElementById(
+      "lista-produtos"
+    );
+
+
+  if (!produtos.length) {
+
+    lista.innerHTML = `
+      <div class="erro-produtos">
+
+        <h3>
+          Nenhum produto encontrado.
+        </h3>
+
+        <p>
+          Novas ofertas serão adicionadas em breve.
+        </p>
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  lista.innerHTML =
+    produtos.map(function(produto) {
+
+
+      const nome =
+        produto.name ||
+        "Produto";
+
+
+      const descricao =
+        produto.description ||
+        "";
+
+
+      const imagem =
+        produto.image_url ||
+        "";
+
+
+      const link =
+        produto.shopee_url ||
+        "#";
+
+
+      let imagemHTML;
+
+
+      if (imagem.trim() !== "") {
 
         imagemHTML = `
-
           <img
-            src="${produto.image_url}"
-            alt="${produto.name}"
-            loading="lazy">
-
+            src="${imagem}"
+            alt="${nome}"
+            loading="lazy"
+          >
         `;
 
       } else {
 
         imagemHTML = `
-
           <div class="produto-sem-imagem">
             🛍️
           </div>
-
         `;
 
       }
@@ -578,7 +688,12 @@ async function carregarProdutos() {
 
       return `
 
-        <div class="product">
+        <div
+          class="product"
+          data-name="${nome}"
+          data-description="${descricao}"
+          data-category="${produto.category || produto.categoria || ''}"
+        >
 
           <div class="product-image">
 
@@ -590,12 +705,12 @@ async function carregarProdutos() {
           <div class="product-info">
 
             <h3>
-              ${produto.name || "Produto"}
+              ${nome}
             </h3>
 
 
             <p>
-              ${produto.description || ""}
+              ${descricao}
             </p>
 
 
@@ -605,7 +720,7 @@ async function carregarProdutos() {
 
 
             <a
-              href="${produto.shopee_url || "#"}"
+              href="${link}"
               target="_blank"
               rel="noopener noreferrer"
               class="buy">
@@ -622,35 +737,283 @@ async function carregarProdutos() {
 
     }).join("");
 
+}
 
-  } catch (erro) {
 
-    console.error(
-      "Erro ao carregar produtos:",
-      erro
+/* =========================
+   FILTRAR CATEGORIA
+========================= */
+
+function filtrarCategoria(
+  categoria,
+  botao
+) {
+
+  categoriaAtual =
+    categoria;
+
+
+  document
+    .querySelectorAll(".category")
+    .forEach(function(item) {
+
+      item.classList.remove(
+        "ativa"
+      );
+
+    });
+
+
+  botao.classList.add(
+    "ativa"
+  );
+
+
+  const filtrados =
+    todosProdutos.filter(
+      function(produto) {
+
+        const categoriaProduto =
+          (
+            produto.category ||
+            produto.categoria ||
+            ""
+          ).toLowerCase();
+
+
+        /*
+          Como seu banco ainda pode não
+          ter categoria, também tentamos
+          identificar pela descrição/nome.
+        */
+
+        const texto =
+          (
+            (produto.name || "") +
+            " " +
+            (produto.description || "")
+          ).toLowerCase();
+
+
+        const categoriaBusca =
+          categoria.toLowerCase();
+
+
+        if (
+          categoriaProduto ===
+          categoriaBusca
+        ) {
+
+          return true;
+
+        }
+
+
+        if (
+          categoriaBusca === "tecnologia" &&
+          (
+            texto.includes("celular") ||
+            texto.includes("telefone") ||
+            texto.includes("eletrôn") ||
+            texto.includes("digital") ||
+            texto.includes("usb") ||
+            texto.includes("smart") ||
+            texto.includes("relógio")
+          )
+        ) {
+
+          return true;
+
+        }
+
+
+        if (
+          categoriaBusca === "beleza" &&
+          (
+            texto.includes("beleza") ||
+            texto.includes("maquiagem") ||
+            texto.includes("cabelo") ||
+            texto.includes("unha") ||
+            texto.includes("cosmético")
+          )
+        ) {
+
+          return true;
+
+        }
+
+
+        if (
+          categoriaBusca === "perfumes" &&
+          (
+            texto.includes("perfume") ||
+            texto.includes("fragrância") ||
+            texto.includes("colônia") ||
+            texto.includes("colonia")
+          )
+        ) {
+
+          return true;
+
+        }
+
+
+        if (
+          categoriaBusca === "casa" &&
+          (
+            texto.includes("casa") ||
+            texto.includes("cozinha") ||
+            texto.includes("domést") ||
+            texto.includes("decoração") ||
+            texto.includes("decoracao")
+          )
+        ) {
+
+          return true;
+
+        }
+
+
+        return false;
+
+      }
     );
 
 
-    lista.innerHTML = `
+  mostrarProdutos(
+    filtrados
+  );
 
-      <div class="erro-produtos">
 
-        <h3>
-          ⚠️ Não foi possível carregar as ofertas.
-        </h3>
-
-        <p>
-          Tente atualizar a página.
-        </p>
-
-      </div>
-
-    `;
-
-  }
+  document
+    .getElementById("produtos")
+    .scrollIntoView({
+      behavior: "smooth"
+    });
 
 }
 
+
+/* =========================
+   MOSTRAR TODOS
+========================= */
+
+function mostrarTodos(
+  botao
+) {
+
+  categoriaAtual =
+    "Todos";
+
+
+  document
+    .querySelectorAll(".category")
+    .forEach(function(item) {
+
+      item.classList.remove(
+        "ativa"
+      );
+
+    });
+
+
+  botao.classList.add(
+    "ativa"
+  );
+
+
+  mostrarProdutos(
+    todosProdutos
+  );
+
+
+  document
+    .getElementById("produtos")
+    .scrollIntoView({
+      behavior: "smooth"
+    });
+
+}
+
+
+/* =========================
+   PESQUISA
+========================= */
+
+function buscarProduto(
+  texto
+) {
+
+  texto =
+    texto
+      .toLowerCase()
+      .trim();
+
+
+  if (!texto) {
+
+    if (
+      categoriaAtual ===
+      "Todos"
+    ) {
+
+      mostrarProdutos(
+        todosProdutos
+      );
+
+    } else {
+
+      filtrarCategoria(
+        categoriaAtual,
+        document.querySelector(
+          ".category.ativa"
+        )
+      );
+
+    }
+
+    return;
+
+  }
+
+
+  const resultado =
+    todosProdutos.filter(
+      function(produto) {
+
+        const nome =
+          (
+            produto.name ||
+            ""
+          ).toLowerCase();
+
+
+        const descricao =
+          (
+            produto.description ||
+            ""
+          ).toLowerCase();
+
+
+        return (
+          nome.includes(texto) ||
+          descricao.includes(texto)
+        );
+
+      }
+    );
+
+
+  mostrarProdutos(
+    resultado
+  );
+
+}
+
+
+/* =========================
+   INICIAR
+========================= */
 
 carregarProdutos();
 
