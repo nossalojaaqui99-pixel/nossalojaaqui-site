@@ -1,353 +1,173 @@
-var worker_default = {
-
+export default {
   async fetch(request, env) {
 
     const url = new URL(request.url);
 
-    // ==========================================
-    // CORS
-    // ==========================================
+    // =========================
+    // API - LISTAR PRODUTOS
+    // =========================
 
-    if (request.method === "OPTIONS") {
+    if (
+      url.pathname === "/api/produtos" &&
+      request.method === "GET"
+    ) {
 
-      return new Response(null, {
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type"
-        }
-      });
+      try {
+
+        const result = await env.DB
+          .prepare(`
+            SELECT *
+            FROM products
+            ORDER BY id DESC
+          `)
+          .all();
+
+        return new Response(
+          JSON.stringify({
+            sucesso: true,
+            produtos: result.results
+          }),
+          {
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+              "Access-Control-Allow-Origin": "*"
+            }
+          }
+        );
+
+      } catch (error) {
+
+        return new Response(
+          JSON.stringify({
+            sucesso: false,
+            erro: error.message
+          }),
+          {
+            status: 500,
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+              "Access-Control-Allow-Origin": "*"
+            }
+          }
+        );
+
+      }
 
     }
 
 
-    // ==========================================
-    // API DE PRODUTOS
-    // ==========================================
+    // =========================
+    // API - SALVAR PRODUTO
+    // =========================
 
-    if (url.pathname === "/api/produtos") {
+    if (
+      url.pathname === "/api/produtos" &&
+      request.method === "POST"
+    ) {
 
-      // ========================================
-      // LISTAR PRODUTOS
-      // ========================================
+      try {
 
-      if (request.method === "GET") {
+        const dados = await request.json();
 
-        try {
-
-          const result = await env.DB
-            .prepare(
-              "SELECT * FROM products ORDER BY id DESC"
-            )
-            .all();
+        const nome = dados.name || "";
+        const preco = dados.price || "";
+        const categoria = dados.category || "";
+        const imagem = dados.image_url || "";
+        const link = dados.shopee_url || "";
+        const descricao = dados.description || "";
 
 
-          return new Response(
-
-            JSON.stringify({
-              sucesso: true,
-              produtos: result.results
-            }),
-
-            {
-              headers: {
-                "Content-Type":
-                  "application/json; charset=UTF-8",
-
-                "Access-Control-Allow-Origin": "*"
-              }
-            }
-
-          );
-
-        } catch (error) {
+        if (
+          !nome ||
+          !preco ||
+          !categoria ||
+          !imagem ||
+          !link ||
+          !descricao
+        ) {
 
           return new Response(
-
             JSON.stringify({
               sucesso: false,
-              erro: error.message
+              erro: "Preencha todos os campos."
             }),
-
             {
-              status: 500,
-
+              status: 400,
               headers: {
-                "Content-Type":
-                  "application/json; charset=UTF-8",
-
+                "Content-Type": "application/json; charset=UTF-8",
                 "Access-Control-Allow-Origin": "*"
               }
             }
-
           );
 
         }
 
-      }
 
-
-      // ========================================
-      // ADICIONAR PRODUTO
-      // ========================================
-
-      if (request.method === "POST") {
-
-        try {
-
-          const dados = await request.json();
-
-
-          const nome =
-            dados.name ||
-            dados.nome ||
-            "";
-
-
-          const descricao =
-            dados.description ||
-            dados.descricao ||
-            "";
-
-
-          const preco =
-            dados.price ||
-            dados.preco ||
-            "";
-
-
-          const categoria =
-            dados.category ||
-            dados.categoria ||
-            "";
-
-
-          const imagem =
-            dados.image_url ||
-            dados.imagem ||
-            "";
-
-
-          const link =
-            dados.shopee_url ||
-            dados.link ||
-            "";
-
-
-          if (!nome) {
-
-            return new Response(
-
-              JSON.stringify({
-                sucesso: false,
-                erro: "O nome do produto é obrigatório."
-              }),
-
-              {
-                status: 400,
-
-                headers: {
-                  "Content-Type":
-                    "application/json; charset=UTF-8",
-
-                  "Access-Control-Allow-Origin": "*"
-                }
-              }
-
-            );
-
-          }
-
-
-          // ====================================
-          // VERIFICAR COLUNAS
-          // ====================================
-
-          const colunas = await env.DB
-            .prepare("PRAGMA table_info(products)")
-            .all();
-
-
-          const nomesColunas =
-            colunas.results.map(
-              coluna => coluna.name
-            );
-
-
-          // ====================================
-          // CRIAR COLUNA PRICE SE NÃO EXISTIR
-          // ====================================
-
-          if (!nomesColunas.includes("price")) {
-
-            await env.DB
-              .prepare(
-                "ALTER TABLE products ADD COLUMN price TEXT"
-              )
-              .run();
-
-          }
-
-
-          // ====================================
-          // CRIAR COLUNA CATEGORY SE NÃO EXISTIR
-          // ====================================
-
-          if (!nomesColunas.includes("category")) {
-
-            await env.DB
-              .prepare(
-                "ALTER TABLE products ADD COLUMN category TEXT"
-              )
-              .run();
-
-          }
-
-
-          // ====================================
-          // INSERIR PRODUTO
-          // ====================================
-
-          const resultado = await env.DB
-
-            .prepare(`
-              INSERT INTO products
-              (
-                name,
-                description,
-                image_url,
-                shopee_url,
-                price,
-                category
-              )
-
-              VALUES (?, ?, ?, ?, ?, ?)
-            `)
-
-            .bind(
-              nome,
-              descricao,
-              imagem,
-              link,
-              preco,
-              categoria
+        await env.DB
+          .prepare(`
+            INSERT INTO products
+            (
+              name,
+              price,
+              category,
+              image_url,
+              shopee_url,
+              description
             )
+            VALUES (?, ?, ?, ?, ?, ?)
+          `)
+          .bind(
+            nome,
+            preco,
+            categoria,
+            imagem,
+            link,
+            descricao
+          )
+          .run();
 
-            .run();
 
-
-          return new Response(
-
-            JSON.stringify({
-
-              sucesso: true,
-
-              mensagem:
-                "Produto salvo com sucesso!",
-
-              id:
-                resultado.meta.last_row_id
-
-            }),
-
-            {
-
-              status: 200,
-
-              headers: {
-
-                "Content-Type":
-                  "application/json; charset=UTF-8",
-
-                "Access-Control-Allow-Origin": "*"
-
-              }
-
+        return new Response(
+          JSON.stringify({
+            sucesso: true,
+            mensagem: "Produto salvo com sucesso!"
+          }),
+          {
+            status: 200,
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+              "Access-Control-Allow-Origin": "*"
             }
+          }
+        );
 
-          );
 
-        } catch (error) {
+      } catch (error) {
 
-          return new Response(
-
-            JSON.stringify({
-
-              sucesso: false,
-
-              erro: error.message
-
-            }),
-
-            {
-
-              status: 500,
-
-              headers: {
-
-                "Content-Type":
-                  "application/json; charset=UTF-8",
-
-                "Access-Control-Allow-Origin": "*"
-
-              }
-
+        return new Response(
+          JSON.stringify({
+            sucesso: false,
+            erro: error.message
+          }),
+          {
+            status: 500,
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+              "Access-Control-Allow-Origin": "*"
             }
-
-          );
-
-        }
+          }
+        );
 
       }
-
-
-      // ========================================
-      // MÉTODO NÃO PERMITIDO
-      // ========================================
-
-      return new Response(
-
-        JSON.stringify({
-
-          sucesso: false,
-
-          erro: "Método não permitido."
-
-        }),
-
-        {
-
-          status: 405,
-
-          headers: {
-
-            "Content-Type":
-              "application/json; charset=UTF-8",
-
-            "Access-Control-Allow-Origin": "*"
-
-          }
-
-        }
-
-      );
 
     }
 
 
-    // ==========================================
-    // ENTREGA O SITE PELOS ASSETS
-    // ==========================================
+    // =========================
+    // ENTREGA O SITE
+    // =========================
 
     return env.ASSETS.fetch(request);
 
   }
-
-};
-
-
-export {
-
-  worker_default as default
-
 };
