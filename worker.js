@@ -198,20 +198,12 @@ export default {
     // =========================================
 
     if (env.ASSETS) {
-      return env.ASSETS.fetch(request);
-    }
+  return env.ASSETS.fetch(request);
+}
 
-
-    return new Response(
-      "Catálogo Nossalojaaqui",
-      {
-        status: 200,
-        headers: {
-          "Content-Type":
-            "text/html; charset=UTF-8"
-        }
-      }
-    );
-
+return new Response("Assets não configurados", {
+  status: 500,
+  headers: {
+    "Content-Type": "text/plain; charset=UTF-8"
   }
-};
+});
