@@ -11,6 +11,7 @@ export default {
       url.pathname === "/api/produtos" &&
       request.method === "GET"
     ) {
+
       try {
 
         const result = await env.DB
@@ -63,36 +64,19 @@ export default {
       url.pathname === "/api/produtos" &&
       request.method === "POST"
     ) {
+
       try {
 
         const dados = await request.json();
 
-        const nome =
-          dados.name || "";
-
-        const preco =
-          dados.price || "";
-
-        const categoria =
-          dados.category || "";
-
-        const imagem =
-          dados.image_url || "";
-
-        const link =
-          dados.shopee_url || "";
-
-        const descricao =
-          dados.description || "";
-
-        const cores =
-          dados.colors || "";
-
-        const tamanhos =
-          dados.sizes || "";
-
-
-        // Somente estes campos são obrigatórios
+        const nome = dados.name || "";
+        const preco = dados.price || "";
+        const categoria = dados.category || "";
+        const imagem = dados.image_url || "";
+        const link = dados.shopee_url || "";
+        const descricao = dados.description || "";
+        const cores = dados.colors || "";
+        const tamanhos = dados.sizes || "";
 
         if (
           !nome ||
@@ -119,11 +103,6 @@ export default {
           );
 
         }
-
-
-        // =========================================
-        // GRAVAR NO D1
-        // =========================================
 
         await env.DB
           .prepare(`
@@ -152,12 +131,10 @@ export default {
           )
           .run();
 
-
         return new Response(
           JSON.stringify({
             sucesso: true,
-            mensagem:
-              "Produto salvo com sucesso!"
+            mensagem: "Produto salvo com sucesso!"
           }),
           {
             status: 200,
@@ -169,7 +146,6 @@ export default {
             }
           }
         );
-
 
       } catch (error) {
 
@@ -194,16 +170,25 @@ export default {
 
 
     // =========================================
-    // SITE / ARQUIVOS
+    // ARQUIVOS DO SITE
     // =========================================
 
     if (env.ASSETS) {
-  return env.ASSETS.fetch(request);
-}
 
-return new Response("Assets não configurados", {
-  status: 500,
-  headers: {
-    "Content-Type": "text/plain; charset=UTF-8"
+      return env.ASSETS.fetch(request);
+
+    }
+
+    return new Response(
+      "Assets não configurados",
+      {
+        status: 500,
+        headers: {
+          "Content-Type":
+            "text/plain; charset=UTF-8"
+        }
+      }
+    );
+
   }
-});
+};
