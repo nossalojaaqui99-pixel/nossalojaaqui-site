@@ -4,6 +4,7 @@ compatibility_date = "2026-08-23"
 
 [assets]
 directory = "./site"
+binding = "ASSETS"
 
 [[d1_databases]]
 binding = "DB"
