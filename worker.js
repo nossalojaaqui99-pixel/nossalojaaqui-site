@@ -57,6 +57,87 @@ export default {
 
 
     // =========================================
+    // BUSCAR PRODUTO SHOPEE
+    // =========================================
+
+    if (
+      url.pathname === "/api/shopee-produto" &&
+      request.method === "POST"
+    ) {
+
+      try {
+
+        const dados = await request.json();
+
+        const link = dados.url || "";
+
+        if (!link) {
+
+          return new Response(
+            JSON.stringify({
+              sucesso: false,
+              erro: "Informe o link do produto."
+            }),
+            {
+              status: 400,
+              headers: {
+                "Content-Type":
+                  "application/json; charset=UTF-8",
+                "Access-Control-Allow-Origin":
+                  "*"
+              }
+            }
+          );
+
+        }
+
+        /*
+         * Neste momento não fazemos scraping da Shopee.
+         *
+         * Retornamos o link em JSON para que o painel
+         * não receba uma resposta vazia ou HTML.
+         */
+
+        return new Response(
+          JSON.stringify({
+            sucesso: false,
+            erro:
+              "A busca automática de dados da Shopee ainda não está configurada. Cole o link e preencha os dados do produto manualmente."
+          }),
+          {
+            status: 200,
+            headers: {
+              "Content-Type":
+                "application/json; charset=UTF-8",
+              "Access-Control-Allow-Origin":
+                "*"
+            }
+          }
+        );
+
+      } catch (error) {
+
+        return new Response(
+          JSON.stringify({
+            sucesso: false,
+            erro: error.message
+          }),
+          {
+            status: 500,
+            headers: {
+              "Content-Type":
+                "application/json; charset=UTF-8",
+              "Access-Control-Allow-Origin":
+                "*"
+            }
+          }
+        );
+
+      }
+    }
+
+
+    // =========================================
     // SALVAR PRODUTO
     // =========================================
 
@@ -89,7 +170,7 @@ export default {
             JSON.stringify({
               sucesso: false,
               erro:
-                "Preencha nome, preço, categoria e link da Shopee."
+                "Preencha nome, preço, categoria e link do produto."
             }),
             {
               status: 400,
@@ -134,7 +215,8 @@ export default {
         return new Response(
           JSON.stringify({
             sucesso: true,
-            mensagem: "Produto salvo com sucesso!"
+            mensagem:
+              "Produto salvo com sucesso!"
           }),
           {
             status: 200,
