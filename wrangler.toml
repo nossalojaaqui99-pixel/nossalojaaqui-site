@@ -10,3 +10,6 @@ binding = "ASSETS"
 binding = "DB"
 database_name = "nossalojaaqui"
 database_id = "472d7155-7a86-465b-88a3-92bcc69c9495"
+[[routes]]
+pattern = "catalogo.nossalojaaqui.com.br"
+custom_domain = true
