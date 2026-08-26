@@ -1,1 +1,800 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Painel do Lojista | Nossalojaaqui</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #f5f5f5;
+      color: #222;
+      padding: 30px 15px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+    }
+
+    .painel {
+      background: #fff;
+      padding: 30px;
+      border-radius: 18px;
+      box-shadow: 0 5px 25px rgba(0,0,0,.10);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .subtitulo {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 18px;
+      margin-bottom: 7px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px;
+      border: 0;
+      border-radius: 12px;
+      background: #ffd900;
+      color: #222;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #efca00;
+    }
+
+    .buscar {
+      background: #111;
+      color: #fff;
+    }
+
+    .buscar:hover {
+      background: #333;
+    }
+
+    .preview {
+      display: none;
+      width: 200px;
+      height: 200px;
+      object-fit: contain;
+      margin: 20px auto;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      background: #fff;
+    }
+
+    .resultado {
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 10px;
+      background: #f7f7f7;
+      display: none;
+    }
+
+    .produto-encontrado {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .mensagem {
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .voltar {
+      display: block;
+      text-align: center;
+      margin-top: 25px;
+      color: #333;
+      text-decoration: none;
+    }
+
+    .ajuda {
+      margin-top: 8px;
+      color: #777;
+      font-size: 13px;
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+  <div class="container">
+
+    <div class="painel">
+
+      <h1>
+        ⚙️ Painel do Lojista
+      </h1>
+
+      <p class="subtitulo">
+        Cadastre produtos no Nossalojaaqui
+      </p>
+
+
+      <!-- NOME -->
+
+      <label for="nome">
+        🏷️ Nome do produto
+      </label>
+
+      <input
+        type="text"
+        id="nome"
+        placeholder="Nome do produto"
+      >
+
+
+      <!-- PREÇO -->
+
+      <label for="preco">
+        💰 Preço
+      </label>
+
+      <input
+        type="text"
+        id="preco"
+        placeholder="Ex.: 39,90"
+      >
+
+
+      <!-- CATEGORIA -->
+
+      <label for="categoria">
+        📂 Categoria
+      </label>
+
+      <select id="categoria">
+
+        <option value="">
+          Selecione uma categoria
+        </option>
+
+        <option value="Beleza">
+          💄 Beleza
+        </option>
+
+        <option value="Perfumes">
+          🌸 Perfumes
+        </option>
+
+        <option value="Casa">
+          🏠 Casa
+        </option>
+
+        <option value="Tecnologia">
+          📱 Tecnologia
+        </option>
+
+        <option value="Outros">
+          🎁 Outros
+        </option>
+
+      </select>
+
+
+      <!-- LINK SHOPEE -->
+
+      <label for="link">
+        🔗 Link do produto Shopee
+      </label>
+
+      <input
+        type="url"
+        id="link"
+        placeholder="Cole aqui o link do produto da Shopee"
+      >
+
+      <p class="ajuda">
+        Cole o link do produto e clique em Buscar Produto.
+      </p>
+
+
+      <!-- BUSCAR -->
+
+      <button
+        type="button"
+        class="buscar"
+        onclick="buscarProdutoShopee()"
+      >
+        🔍 BUSCAR PRODUTO
+      </button>
+
+
+      <!-- PREVIEW -->
+
+      <img
+        id="preview"
+        class="preview"
+        alt="Foto do produto"
+      >
+
+
+      <!-- RESULTADO -->
+
+      <div
+        id="produtoShopee"
+        class="resultado"
+      ></div>
+
+
+      <!-- DESCRIÇÃO -->
+
+      <label for="descricao">
+        📝 Descrição
+      </label>
+
+      <textarea
+        id="descricao"
+        placeholder="Descrição do produto..."
+      ></textarea>
+
+
+      <!-- CORES -->
+
+      <label for="cores">
+        🎨 Cores
+      </label>
+
+      <input
+        type="text"
+        id="cores"
+        placeholder="Ex.: Preto, Branco, Azul"
+      >
+
+      <p class="ajuda">
+        Deixe vazio se o produto não tiver variações de cor.
+      </p>
+
+
+      <!-- TAMANHOS -->
+
+      <label for="tamanhos">
+        📏 Tamanhos
+      </label>
+
+      <input
+        type="text"
+        id="tamanhos"
+        placeholder="Ex.: P, M, G, GG"
+      >
+
+      <p class="ajuda">
+        Deixe vazio se o produto não tiver tamanhos.
+      </p>
+
+
+      <!-- SALVAR -->
+
+      <button
+        type="button"
+        onclick="salvarProduto()"
+      >
+        💾 SALVAR PRODUTO
+      </button>
+
+
+      <div
+        id="mensagem"
+        class="mensagem"
+      ></div>
+
+
+      <a
+        class="voltar"
+        href="/"
+      >
+        ← Voltar para o site
+      </a>
+
+    </div>
+
+  </div>
+
+
+<script>
+
+/* ==========================================
+   BUSCAR PRODUTO SHOPEE
+========================================== */
+
+async function buscarProdutoShopee() {
+
+  const link =
+    document
+      .getElementById("link")
+      .value
+      .trim();
+
+  const mensagem =
+    document
+      .getElementById("mensagem");
+
+  const resultado =
+    document
+      .getElementById("produtoShopee");
+
+  const preview =
+    document
+      .getElementById("preview");
+
+
+  if (!link) {
+
+    mensagem.style.color = "red";
+
+    mensagem.innerText =
+      "⚠️ Cole o link do produto da Shopee.";
+
+    return;
+  }
+
+
+  mensagem.style.color = "#555";
+
+  mensagem.innerText =
+    "⏳ Buscando produto na Shopee...";
+
+
+  resultado.style.display = "none";
+
+  preview.style.display = "none";
+
+
+  try {
+
+    const resposta =
+      await fetch(
+        "/api/shopee-produto",
+        {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            url: link
+          })
+
+        }
+      );
+
+
+    const dados =
+      await resposta.json();
+
+
+    if (!resposta.ok ||
+        dados.sucesso === false) {
+
+      throw new Error(
+        dados.erro ||
+        "Não foi possível buscar o produto."
+      );
+
+    }
+
+
+    /* NOME */
+
+    if (dados.produto?.name) {
+
+      document
+        .getElementById("nome")
+        .value =
+        dados.produto.name;
+
+    }
+
+
+    /* PREÇO */
+
+    if (dados.produto?.price) {
+
+      document
+        .getElementById("preco")
+        .value =
+        dados.produto.price;
+
+    }
+
+
+    /* DESCRIÇÃO */
+
+    if (dados.produto?.description) {
+
+      document
+        .getElementById("descricao")
+        .value =
+        dados.produto.description;
+
+    }
+
+
+    /* FOTO */
+
+    if (dados.produto?.image_url) {
+
+      preview.src =
+        dados.produto.image_url;
+
+      preview.style.display =
+        "block";
+
+    }
+
+
+    /* CORES */
+
+    if (dados.produto?.colors) {
+
+      document
+        .getElementById("cores")
+        .value =
+        Array.isArray(
+          dados.produto.colors
+        )
+        ?
+        dados.produto.colors.join(", ")
+        :
+        dados.produto.colors;
+
+    }
+
+
+    /* TAMANHOS */
+
+    if (dados.produto?.sizes) {
+
+      document
+        .getElementById("tamanhos")
+        .value =
+        Array.isArray(
+          dados.produto.sizes
+        )
+        ?
+        dados.produto.sizes.join(", ")
+        :
+        dados.produto.sizes;
+
+    }
+
+
+    resultado.innerHTML =
+      "<div class='produto-encontrado'>" +
+      "✅ Produto encontrado" +
+      "</div>" +
+      "Confira os dados antes de salvar.";
+
+    resultado.style.display =
+      "block";
+
+
+    mensagem.style.color =
+      "green";
+
+    mensagem.innerText =
+      "Produto encontrado. Confira os dados.";
+
+
+  } catch (erro) {
+
+    console.error(erro);
+
+    mensagem.style.color =
+      "red";
+
+    mensagem.innerText =
+      "❌ " + erro.message;
+
+  }
+
+}
+
+
+/* ==========================================
+   SALVAR PRODUTO
+========================================== */
+
+async function salvarProduto() {
+
+  const mensagem =
+    document
+      .getElementById("mensagem");
+
+
+  const nome =
+    document
+      .getElementById("nome")
+      .value
+      .trim();
+
+
+  const preco =
+    document
+      .getElementById("preco")
+      .value
+      .trim();
+
+
+  const categoria =
+    document
+      .getElementById("categoria")
+      .value;
+
+
+  const link =
+    document
+      .getElementById("link")
+      .value
+      .trim();
+
+
+  const descricao =
+    document
+      .getElementById("descricao")
+      .value
+      .trim();
+
+
+  const cores =
+    document
+      .getElementById("cores")
+      .value
+      .trim();
+
+
+  const tamanhos =
+    document
+      .getElementById("tamanhos")
+      .value
+      .trim();
+
+
+  const preview =
+    document
+      .getElementById("preview");
+
+
+  const imagem =
+    preview.src || "";
+
+
+  if (!nome) {
+
+    mensagem.style.color = "red";
+
+    mensagem.innerText =
+      "⚠️ Informe o nome do produto.";
+
+    return;
+
+  }
+
+
+  if (!preco) {
+
+    mensagem.style.color = "red";
+
+    mensagem.innerText =
+      "⚠️ Informe o preço.";
+
+    return;
+
+  }
+
+
+  if (!categoria) {
+
+    mensagem.style.color = "red";
+
+    mensagem.innerText =
+      "⚠️ Selecione uma categoria.";
+
+    return;
+
+  }
+
+
+  if (!link) {
+
+    mensagem.style.color = "red";
+
+    mensagem.innerText =
+      "⚠️ Informe o link da Shopee.";
+
+    return;
+
+  }
+
+
+  mensagem.style.color =
+    "#555";
+
+  mensagem.innerText =
+    "⏳ Salvando produto...";
+
+
+  try {
+
+    const resposta =
+      await fetch(
+        "/api/produtos",
+        {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            name:
+              nome,
+
+            price:
+              preco,
+
+            category:
+              categoria,
+
+            image_url:
+              imagem,
+
+            shopee_url:
+              link,
+
+            description:
+              descricao,
+
+            colors:
+              cores,
+
+            sizes:
+              tamanhos
+
+          })
+
+        }
+      );
+
+
+    const dados =
+      await resposta.json();
+
+
+    if (!resposta.ok ||
+        dados.sucesso === false) {
+
+      throw new Error(
+        dados.erro ||
+        "Não foi possível salvar o produto."
+      );
+
+    }
+
+
+    mensagem.style.color =
+      "green";
+
+    mensagem.innerText =
+      "✅ Produto salvo com sucesso!";
+
+
+    /* LIMPAR CAMPOS */
+
+    document
+      .getElementById("nome")
+      .value = "";
+
+    document
+      .getElementById("preco")
+      .value = "";
+
+    document
+      .getElementById("categoria")
+      .value = "";
+
+    document
+      .getElementById("link")
+      .value = "";
+
+    document
+      .getElementById("descricao")
+      .value = "";
+
+    document
+      .getElementById("cores")
+      .value = "";
+
+    document
+      .getElementById("tamanhos")
+      .value = "";
+
+
+    preview.src = "";
+
+    preview.style.display =
+      "none";
+
+
+    document
+      .getElementById("produtoShopee")
+      .style.display =
+      "none";
+
+
+  } catch (erro) {
+
+    console.error(erro);
+
+    mensagem.style.color =
+      "red";
+
+    mensagem.innerText =
+      "❌ " + erro.message;
+
+  }
+
+}
+
+</script>
+
+</body>
+
+</html>
 
