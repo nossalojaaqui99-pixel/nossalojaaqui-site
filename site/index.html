@@ -280,12 +280,15 @@
           produto.descricao ||
           "";
 
-        const valor =
-          Number(
-            produto.price ||
-            produto.preco ||
-            0
-          );
+     const valorTexto = produto.price || produto.preco || 0;
+
+const valor = Number(
+  String(valorTexto)
+    .replace("R$", "")
+    .replace(/\./g, "")
+    .replace(",", ".")
+    .trim()
+);
 
         const preco =
           valor.toFixed(2).replace(".", ",");
