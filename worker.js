@@ -4,6 +4,37 @@ export default {
     const url = new URL(request.url);
 
     // =========================================
+    // CABEÇALHOS JSON
+    // =========================================
+
+    function jsonResponse(data, status = 200) {
+      return new Response(JSON.stringify(data), {
+        status,
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type"
+        }
+      });
+    }
+
+    // =========================================
+    // CORS
+    // =========================================
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type"
+        }
+      });
+    }
+
+    // =========================================
     // LISTAR PRODUTOS
     // =========================================
 
@@ -22,120 +53,20 @@ export default {
           `)
           .all();
 
-        return new Response(
-          JSON.stringify({
-            sucesso: true,
-            produtos: result.results
-          }),
-          {
-            status: 200,
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-              "Access-Control-Allow-Origin": "*"
-            }
-          }
-        );
+        return jsonResponse({
+          sucesso: true,
+          produtos: result.results
+        });
 
       } catch (error) {
 
-        return new Response(
-          JSON.stringify({
-            sucesso: false,
-            erro: error.message
-          }),
-          {
-            status: 500,
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-              "Access-Control-Allow-Origin": "*"
-            }
-          }
-        );
+        return jsonResponse({
+          sucesso: false,
+          erro: error.message
+        }, 500);
 
       }
     }
-
-
-    // =========================================
-    // BUSCAR PRODUTO SHOPEE
-    // =========================================
-
-    if (
-      url.pathname === "/api/shopee-produto" &&
-      request.method === "POST"
-    ) {
-
-      try {
-
-        const dados = await request.json();
-
-        const link = dados.url || "";
-
-        if (!link) {
-
-          return new Response(
-            JSON.stringify({
-              sucesso: false,
-              erro: "Informe o link do produto."
-            }),
-            {
-              status: 400,
-              headers: {
-                "Content-Type":
-                  "application/json; charset=UTF-8",
-                "Access-Control-Allow-Origin":
-                  "*"
-              }
-            }
-          );
-
-        }
-
-        /*
-         * Neste momento não fazemos scraping da Shopee.
-         *
-         * Retornamos o link em JSON para que o painel
-         * não receba uma resposta vazia ou HTML.
-         */
-
-        return new Response(
-          JSON.stringify({
-            sucesso: false,
-            erro:
-              "A busca automática de dados da Shopee ainda não está configurada. Cole o link e preencha os dados do produto manualmente."
-          }),
-          {
-            status: 200,
-            headers: {
-              "Content-Type":
-                "application/json; charset=UTF-8",
-              "Access-Control-Allow-Origin":
-                "*"
-            }
-          }
-        );
-
-      } catch (error) {
-
-        return new Response(
-          JSON.stringify({
-            sucesso: false,
-            erro: error.message
-          }),
-          {
-            status: 500,
-            headers: {
-              "Content-Type":
-                "application/json; charset=UTF-8",
-              "Access-Control-Allow-Origin":
-                "*"
-            }
-          }
-        );
-
-      }
-    }
-
 
     // =========================================
     // SALVAR PRODUTO
@@ -166,22 +97,11 @@ export default {
           !link
         ) {
 
-          return new Response(
-            JSON.stringify({
-              sucesso: false,
-              erro:
-                "Preencha nome, preço, categoria e link do produto."
-            }),
-            {
-              status: 400,
-              headers: {
-                "Content-Type":
-                  "application/json; charset=UTF-8",
-                "Access-Control-Allow-Origin":
-                  "*"
-              }
-            }
-          );
+          return jsonResponse({
+            sucesso: false,
+            erro:
+              "Preencha nome, preço, categoria e link da Shopee."
+          }, 400);
 
         }
 
@@ -212,44 +132,374 @@ export default {
           )
           .run();
 
-        return new Response(
-          JSON.stringify({
-            sucesso: true,
-            mensagem:
-              "Produto salvo com sucesso!"
-          }),
-          {
-            status: 200,
-            headers: {
-              "Content-Type":
-                "application/json; charset=UTF-8",
-              "Access-Control-Allow-Origin":
-                "*"
-            }
-          }
-        );
+        return jsonResponse({
+          sucesso: true,
+          mensagem: "Produto salvo com sucesso!"
+        });
 
       } catch (error) {
 
-        return new Response(
-          JSON.stringify({
-            sucesso: false,
-            erro: error.message
-          }),
-          {
-            status: 500,
-            headers: {
-              "Content-Type":
-                "application/json; charset=UTF-8",
-              "Access-Control-Allow-Origin":
-                "*"
-            }
-          }
-        );
+        return jsonResponse({
+          sucesso: false,
+          erro: error.message
+        }, 500);
 
       }
     }
 
+    // =========================================
+    // BUSCAR PRODUTO SHOPEE
+    // =========================================
+
+    if (
+      url.pathname === "/api/shopee/buscar" &&
+      request.method === "POST"
+    ) {
+
+      try {
+
+        if (!env.SHOPEE_APP_ID || !env.SHOPEE_SECRET) {
+
+          return jsonResponse({
+            sucesso: false,
+            erro:
+              "SHOPEE_APP_ID ou SHOPEE_SECRET não configurado no Cloudflare."
+          }, 500);
+
+        }
+
+        const dados = await request.json();
+
+        const link = String(dados.link || "").trim();
+
+        if (!link) {
+
+          return jsonResponse({
+            sucesso: false,
+            erro: "Cole o link do produto da Shopee."
+          }, 400);
+
+        }
+
+        // -----------------------------------------
+        // Extrair Shop ID e Item ID
+        // -----------------------------------------
+
+        let shopId = null;
+        let itemId = null;
+
+        // Formato:
+        // shopee.com.br/xxxxx-i.1494995608.44507205958
+
+        let match = link.match(
+          /-i\.(\d+)\.(\d+)/
+        );
+
+        if (match) {
+
+          shopId = match[1];
+          itemId = match[2];
+
+        }
+
+        // Formato:
+        // /product/1494995608/44507205958
+
+        if (!itemId) {
+
+          match = link.match(
+            /\/product\/(\d+)\/(\d+)/
+          );
+
+          if (match) {
+
+            shopId = match[1];
+            itemId = match[2];
+
+          }
+        }
+
+        // -----------------------------------------
+        // Se for link curto
+        // -----------------------------------------
+
+        if (!itemId && link.includes("s.shopee.com.br")) {
+
+          try {
+
+            const respostaRedirect =
+              await fetch(link, {
+                method: "GET",
+                redirect: "manual"
+              });
+
+            const location =
+              respostaRedirect.headers.get("location");
+
+            if (location) {
+
+              match = location.match(
+                /-i\.(\d+)\.(\d+)/
+              );
+
+              if (match) {
+
+                shopId = match[1];
+                itemId = match[2];
+
+              }
+
+              if (!itemId) {
+
+                match = location.match(
+                  /\/product\/(\d+)\/(\d+)/
+                );
+
+                if (match) {
+
+                  shopId = match[1];
+                  itemId = match[2];
+
+                }
+              }
+            }
+
+          } catch (erroRedirect) {
+            // Continua para a mensagem abaixo
+          }
+        }
+
+        if (!itemId) {
+
+          return jsonResponse({
+            sucesso: false,
+            erro:
+              "Não consegui identificar o ID do produto nesse link. Use o link completo da Shopee."
+          }, 400);
+
+        }
+
+        // -----------------------------------------
+        // GraphQL
+        // -----------------------------------------
+
+        const query = `
+          {
+            productOfferV2(
+              itemId: ${itemId}
+              shopId: ${shopId || 0}
+              limit: 1
+            ) {
+              nodes {
+                itemId
+                commissionRate
+                commission
+                price
+                sales
+                imageUrl
+                productName
+                shopName
+                productLink
+                offerLink
+                priceMin
+                priceMax
+                productCatIds
+                ratingStar
+                priceDiscountRate
+                shopId
+                shopType
+                sellerCommissionRate
+                shopeeCommissionRate
+              }
+
+              pageInfo {
+                page
+                limit
+                hasNextPage
+                scrollId
+              }
+            }
+          }
+        `;
+
+        const payload =
+          JSON.stringify({
+            query
+          });
+
+        // -----------------------------------------
+        // Assinatura Shopee
+        // -----------------------------------------
+
+        const timestamp =
+          Math.floor(Date.now() / 1000);
+
+        const textoAssinatura =
+          env.SHOPEE_APP_ID +
+          timestamp +
+          payload +
+          env.SHOPEE_SECRET;
+
+        const encoder =
+          new TextEncoder();
+
+        const dadosAssinatura =
+          encoder.encode(textoAssinatura);
+
+        const hashBuffer =
+          await crypto.subtle.digest(
+            "SHA-256",
+            dadosAssinatura
+          );
+
+        const assinatura =
+          Array.from(
+            new Uint8Array(hashBuffer)
+          )
+            .map(
+              byte =>
+                byte
+                  .toString(16)
+                  .padStart(2, "0")
+            )
+            .join("");
+
+        // -----------------------------------------
+        // Chamada API Shopee
+        // -----------------------------------------
+
+        const resposta =
+          await fetch(
+            "https://open-api.affiliate.shopee.com.br/graphql",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+
+                "Authorization":
+                  `SHA256 Credential=${env.SHOPEE_APP_ID}, Timestamp=${timestamp}, Signature=${assinatura}`
+              },
+
+              body: payload
+            }
+          );
+
+        const texto =
+          await resposta.text();
+
+        let resultado;
+
+        try {
+
+          resultado =
+            JSON.parse(texto);
+
+        } catch (erroJSON) {
+
+          return jsonResponse({
+            sucesso: false,
+            erro:
+              "A Shopee retornou uma resposta que não é JSON.",
+            status: resposta.status,
+            resposta: texto.substring(0, 500)
+          }, 502);
+
+        }
+
+        // -----------------------------------------
+        // Erro da Shopee
+        // -----------------------------------------
+
+        if (resultado.errors) {
+
+          return jsonResponse({
+            sucesso: false,
+            erro:
+              resultado.errors[0]?.message ||
+              "Erro retornado pela API da Shopee.",
+            detalhes:
+              resultado.errors
+          }, 400);
+
+        }
+
+        const produtos =
+          resultado?.data?.productOfferV2?.nodes || [];
+
+        if (!produtos.length) {
+
+          return jsonResponse({
+            sucesso: false,
+            erro:
+              "A Shopee não encontrou esse produto na API de Afiliados.",
+            itemId,
+            shopId
+          }, 404);
+
+        }
+
+        const produto = produtos[0];
+
+        // -----------------------------------------
+        // Resultado para o painel
+        // -----------------------------------------
+
+        return jsonResponse({
+          sucesso: true,
+
+          produto: {
+            itemId:
+              produto.itemId,
+
+            shopId:
+              produto.shopId,
+
+            nome:
+              produto.productName || "",
+
+            preco:
+              produto.price || "",
+
+            precoMin:
+              produto.priceMin || "",
+
+            precoMax:
+              produto.priceMax || "",
+
+            imagem:
+              produto.imageUrl || "",
+
+            loja:
+              produto.shopName || "",
+
+            link:
+              produto.productLink || link,
+
+            linkAfiliado:
+              produto.offerLink || "",
+
+            desconto:
+              produto.priceDiscountRate || 0,
+
+            avaliacao:
+              produto.ratingStar || "",
+
+            comissao:
+              produto.commissionRate || ""
+          }
+        });
+
+      } catch (error) {
+
+        return jsonResponse({
+          sucesso: false,
+          erro: error.message
+        }, 500);
+
+      }
+    }
 
     // =========================================
     // ARQUIVOS DO SITE
@@ -271,6 +521,5 @@ export default {
         }
       }
     );
-
   }
 };
