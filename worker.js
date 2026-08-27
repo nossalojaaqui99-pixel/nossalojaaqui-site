@@ -500,7 +500,282 @@ export default {
 
       }
     }
+// =========================================
+// BUSCAR PRODUTO SHOPEE
+// =========================================
 
+if (
+  url.pathname === "/api/shopee-produto" &&
+  request.method === "POST"
+) {
+
+  try {
+
+    const dados = await request.json();
+    const link = dados.url || "";
+
+    if (!link) {
+      return new Response(
+        JSON.stringify({
+          sucesso: false,
+          erro: "Link da Shopee não informado."
+        }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            "Access-Control-Allow-Origin": "*"
+          }
+        }
+      );
+    }
+
+    // Extrai Shop ID e Item ID do link da Shopee
+    const match = link.match(/i\.(\d+)\.(\d+)/);
+
+    if (!match) {
+      return new Response(
+        JSON.stringify({
+          sucesso: false,
+          erro: "Não foi possível identificar o produto no link da Shopee."
+        }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            "Access-Control-Allow-Origin": "*"
+          }
+        }
+      );
+    }
+
+    const shopId = match[1];
+    const itemId = match[2];
+
+    // Query GraphQL da Shopee
+    const query = `
+      {
+        productOfferV2(
+          itemId: ${itemId},
+          shopId: ${shopId}
+        ) {
+          nodes {
+            itemId
+            commissionRate
+            commission
+            price
+            sales
+            imageUrl
+            productName
+            shopName
+            productLink
+            offerLink
+            priceMin
+            priceMax
+            ratingStar
+            priceDiscountRate
+            shopId
+            sellerCommissionRate
+            shopeeCommissionRate
+          }
+          pageInfo {
+            page
+            limit
+            hasNextPage
+            scrollId
+          }
+        }
+      }
+    `;
+
+    const payload = JSON.stringify({
+      query: query
+    });
+
+    const timestamp = Math.floor(Date.now() / 1000);
+
+    // Assinatura Shopee
+    const assinaturaTexto =
+      env.SHOPEE_APP_ID +
+      timestamp +
+      payload +
+      env.SHOPEE_SECRET;
+
+    const encoder = new TextEncoder();
+
+    const hashBuffer = await crypto.subtle.digest(
+      "SHA-256",
+      encoder.encode(assinaturaTexto)
+    );
+
+    const hashArray = Array.from(
+      new Uint8Array(hashBuffer)
+    );
+
+    const signature = hashArray
+      .map(
+        byte => byte.toString(16).padStart(2, "0")
+      )
+      .join("");
+
+    const respostaShopee = await fetch(
+      "https://open-api.affiliate.shopee.com.br/graphql",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization":
+            `SHA256 Credential=${env.SHOPEE_APP_ID}, Timestamp=${timestamp}, Signature=${signature}`
+        },
+
+        body: payload
+      }
+    );
+
+    const texto = await respostaShopee.text();
+
+    let resultado;
+
+    try {
+      resultado = JSON.parse(texto);
+    } catch {
+      throw new Error(
+        "A Shopee retornou uma resposta inválida."
+      );
+    }
+
+    if (resultado.errors) {
+
+      return new Response(
+        JSON.stringify({
+          sucesso: false,
+          erro:
+            resultado.errors[0]?.message ||
+            "Erro retornado pela API da Shopee."
+        }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            "Access-Control-Allow-Origin": "*"
+          }
+        }
+      );
+    }
+
+    const nodes =
+      resultado?.data?.productOfferV2?.nodes || [];
+
+    if (!nodes.length) {
+
+      return new Response(
+        JSON.stringify({
+          sucesso: false,
+          erro:
+            "A Shopee não encontrou uma oferta para este produto. Verifique se o produto está disponível para afiliados."
+        }),
+        {
+          status: 404,
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            "Access-Control-Allow-Origin": "*"
+          }
+        }
+      );
+    }
+
+    const produtoShopee = nodes[0];
+
+    // Formato usado pelo painel admin
+    const produto = {
+
+      nome:
+        produtoShopee.productName || "",
+
+      preco:
+        produtoShopee.price || "",
+
+      imagem:
+        produtoShopee.imageUrl || "",
+
+      descricao:
+        produtoShopee.productName || "",
+
+      categoria:
+        "Outros",
+
+      cores:
+        "",
+
+      tamanhos:
+        "",
+
+      link:
+        produtoShopee.offerLink ||
+        produtoShopee.productLink ||
+        link,
+
+      shopName:
+        produtoShopee.shopName || "",
+
+      commissionRate:
+        produtoShopee.commissionRate || "",
+
+      commission:
+        produtoShopee.commission || "",
+
+      ratingStar:
+        produtoShopee.ratingStar || "",
+
+      sales:
+        produtoShopee.sales || 0,
+
+      itemId:
+        produtoShopee.itemId || itemId,
+
+      shopId:
+        produtoShopee.shopId || shopId
+    };
+
+    return new Response(
+      JSON.stringify({
+        sucesso: true,
+        produto: produto
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type":
+            "application/json; charset=UTF-8",
+
+          "Access-Control-Allow-Origin":
+            "*"
+        }
+      }
+    );
+
+  } catch (error) {
+
+    return new Response(
+      JSON.stringify({
+        sucesso: false,
+        erro: error.message
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type":
+            "application/json; charset=UTF-8",
+
+          "Access-Control-Allow-Origin":
+            "*"
+        }
+      }
+    );
+
+  }
+}
     // =========================================
     // ARQUIVOS DO SITE
     // =========================================
