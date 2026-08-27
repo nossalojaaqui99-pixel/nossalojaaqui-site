@@ -1,113 +1,125 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Nossalojaaqui | Catálogo</title>
+  <title>Nossalojaaqui | Ofertas e Produtos</title>
 
-<style>
-* {
-  box-sizing: border-box;
-}
+  <meta
+    name="description"
+    content="Nossalojaaqui - Encontre produtos e ofertas selecionadas."
+  >
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  color: #222;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-header {
-  background: #111;
-  color: white;
-  padding: 22px 15px;
-  text-align: center;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
 
-header h1 {
-  margin: 0;
-  font-size: 30px;
-}
+    header {
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 25px 15px;
+    }
 
-header p {
-  margin: 8px 0 0;
-  color: #ddd;
-}
+    header h1 {
+      margin: 0;
+      font-size: 30px;
+    }
 
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-}
+    header p {
+      margin: 8px 0 0;
+      color: #ddd;
+    }
 
-.search {
-  width: 100%;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  font-size: 16px;
-}
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
 
-.products {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-}
+    #search {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-bottom: 25px;
+    }
 
-.product {
-  background: white;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 3px 12px rgba(0,0,0,.08);
-  transition: .2s;
-}
+    #products {
+      display: grid;
+      grid-template-columns: repeat(
+        auto-fill,
+        minmax(220px, 1fr)
+      );
+      gap: 20px;
+    }
 
-.product:hover {
-  transform: translateY(-3px);
-}
+    .product {
+      background: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 3px 12px rgba(0,0,0,.08);
+    }
 
-.product img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  background: #eee;
-}
+    .product img {
+      width: 100%;
+      height: 240px;
+      object-fit: contain;
+      background: #fff;
+    }
 
-.product-info {
-  padding: 15px;
-}
+    .product-info {
+      padding: 15px;
+    }
 
-.product h2 {
-  font-size: 18px;
-  margin: 0 0 10px;
-}
+    .product h2 {
+      font-size: 17px;
+      margin: 0 0 10px;
+      line-height: 1.3;
+    }
 
-.price {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 12px;
-}
+    .price {
+      font-size: 23px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
 
-.button {
-  display: block;
-  width: 100%;
-  text-align: center;
-  background: #25d366;
-  color: white;
-  text-decoration: none;
-  padding: 13px;
-  border-radius: 8px;
-  font-weight: bold;
-}
+    .buy {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      border-radius: 8px;
+      background: #25d366;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      font-weight: bold;
+    }
 
-footer {
-  text-align: center;
-  padding: 30px;
-  color: #777;
-}
-</style>
+    .loading,
+    .empty,
+    .error {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 30px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #777;
+    }
+  </style>
 </head>
 
 <body>
@@ -119,27 +131,18 @@ footer {
 
 <div class="container">
 
-<input
-  type="search"
-  id="search"
-  class="search"
-  placeholder="🔎 Procurar produto..."
->
+  <input
+    type="search"
+    id="search"
+    placeholder="🔎 Procurar produto..."
+  >
 
-<div id="products" class="products">
-
-<div class="product">
-  <img src="https://via.placeholder.com/500x500?text=Produto+1" alt="Produto 1">
-  <div class="product-info">
-    <h2>Produto de exemplo</h2>
-    <div class="price">R$ 39,90</div>
-    <a class="button" href="#" target="_blank">
-      Comprar produto
-    </a>
+  <div id="products">
+    <div class="loading">
+      Carregando produtos...
+    </div>
   </div>
-</div>
 
-</div>
 </div>
 
 <footer>
@@ -147,18 +150,154 @@ footer {
 </footer>
 
 <script>
+
+const products = document.getElementById("products");
 const search = document.getElementById("search");
 
-search.addEventListener("input", function() {
-  const texto = this.value.toLowerCase();
+let listaProdutos = [];
 
-  document.querySelectorAll(".product").forEach(function(produto) {
-    const nome = produto.innerText.toLowerCase();
+// ==========================================
+// CARREGAR PRODUTOS
+// ==========================================
 
-    produto.style.display =
-      nome.includes(texto) ? "" : "none";
+async function carregarProdutos() {
+
+  try {
+
+    const resposta = await fetch("/api/produtos");
+
+    const dados = await resposta.json();
+
+    if (!resposta.ok || dados.sucesso === false) {
+      throw new Error(
+        dados.erro || "Não foi possível carregar os produtos."
+      );
+    }
+
+    listaProdutos = dados.produtos || [];
+
+    mostrarProdutos(listaProdutos);
+
+  } catch (erro) {
+
+    console.error(erro);
+
+    products.innerHTML = `
+      <div class="error">
+        ❌ Não foi possível carregar os produtos.
+      </div>
+    `;
+  }
+}
+
+// ==========================================
+// MOSTRAR PRODUTOS
+// ==========================================
+
+function mostrarProdutos(lista) {
+
+  if (!lista.length) {
+
+    products.innerHTML = `
+      <div class="empty">
+        Nenhum produto cadastrado ainda.
+      </div>
+    `;
+
+    return;
+  }
+
+  products.innerHTML = "";
+
+  lista.forEach(produto => {
+
+    const card = document.createElement("div");
+
+    card.className = "product";
+
+    const imagem =
+      produto.image_url ||
+      "https://via.placeholder.com/500x500?text=Produto";
+
+    const nome =
+      produto.name ||
+      "Produto";
+
+    const preco =
+      Number(produto.price || 0)
+        .toFixed(2)
+        .replace(".", ",");
+
+    const link =
+      produto.shopee_url ||
+      "#";
+
+    card.innerHTML = `
+
+      <img
+        src="${imagem}"
+        alt="${nome}"
+        onerror="this.src='https://via.placeholder.com/500x500?text=Produto'"
+      >
+
+      <div class="product-info">
+
+        <h2>${nome}</h2>
+
+        <div class="price">
+          R$ ${preco}
+        </div>
+
+        <a
+          class="buy"
+          href="${link}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          🛒 Comprar produto
+        </a>
+
+      </div>
+
+    `;
+
+    products.appendChild(card);
+
   });
+}
+
+// ==========================================
+// PESQUISA
+// ==========================================
+
+search.addEventListener("input", function() {
+
+  const texto =
+    this.value
+      .toLowerCase()
+      .trim();
+
+  const filtrados =
+    listaProdutos.filter(produto => {
+
+      const nome =
+        String(produto.name || "")
+          .toLowerCase();
+
+      return nome.includes(texto);
+
+    });
+
+  mostrarProdutos(filtrados);
+
 });
+
+// ==========================================
+// INICIAR
+// ==========================================
+
+carregarProdutos();
+
 </script>
 
 </body>
