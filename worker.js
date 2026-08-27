@@ -2,6 +2,12 @@ export default {
   async fetch(request, env) {
 
     const url = new URL(request.url);
+    if (!env.SHOPEE_APP_ID || !env.SHOPEE_SECRET) {
+  return jsonResponse({
+    sucesso: false,
+    erro: "Credenciais da Shopee não estão disponíveis no Worker."
+  }, 500);
+}
 
     // =========================================
     // CABEÇALHOS JSON
