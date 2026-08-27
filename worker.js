@@ -531,7 +531,7 @@ if (
     }
 
     // Extrai Shop ID e Item ID do link da Shopee
-    const match = link.match(/i\.(\d+)\.(\d+)/);
+    const match = link.match(/(?:i\.|item\/)(\d+)(?:\.|\/)(\d+)/i);
 
     if (!match) {
       return new Response(
