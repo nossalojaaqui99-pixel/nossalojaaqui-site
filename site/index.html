@@ -6,11 +6,6 @@
 
   <title>Nossalojaaqui | Ofertas e Produtos</title>
 
-  <meta
-    name="description"
-    content="Nossalojaaqui - Encontre produtos e ofertas selecionadas."
-  >
-
   <style>
     * {
       box-sizing: border-box;
@@ -25,280 +20,362 @@
 
     header {
       background: #111;
-      color: #fff;
+      color: white;
+      padding: 30px 20px;
       text-align: center;
-      padding: 25px 15px;
     }
 
     header h1 {
       margin: 0;
-      font-size: 30px;
+      font-size: 32px;
     }
 
     header p {
       margin: 8px 0 0;
       color: #ddd;
+      font-size: 16px;
     }
 
     .container {
       max-width: 1200px;
       margin: auto;
-      padding: 20px;
+      padding: 25px 20px;
     }
 
-    #search {
+    .search {
       width: 100%;
-      padding: 15px;
+      padding: 16px;
       border: 1px solid #ddd;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 16px;
       margin-bottom: 25px;
+      outline: none;
     }
 
-    #products {
+    .search:focus {
+      border-color: #25d366;
+    }
+
+    .products {
       display: grid;
       grid-template-columns: repeat(
         auto-fill,
         minmax(220px, 1fr)
       );
-      gap: 20px;
+      gap: 22px;
     }
 
     .product {
-      background: #fff;
+      background: white;
       border-radius: 15px;
       overflow: hidden;
       box-shadow: 0 3px 12px rgba(0,0,0,.08);
+      transition: .2s;
     }
 
-    .product img {
+    .product:hover {
+      transform: translateY(-3px);
+    }
+
+    .product-image {
       width: 100%;
-      height: 240px;
+      height: 250px;
       object-fit: contain;
-      background: #fff;
+      background: white;
+      display: block;
     }
 
     .product-info {
-      padding: 15px;
+      padding: 16px;
     }
 
-    .product h2 {
-      font-size: 17px;
+    .product-name {
+      font-size: 18px;
+      font-weight: bold;
       margin: 0 0 10px;
       line-height: 1.3;
     }
 
-    .price {
-      font-size: 23px;
-      font-weight: bold;
+    .product-description {
+      font-size: 14px;
+      color: #666;
       margin-bottom: 12px;
     }
 
-    .buy {
+    .price {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 14px;
+    }
+
+    .buy-button {
       display: block;
       width: 100%;
-      padding: 13px;
-      border-radius: 8px;
+      padding: 14px;
       background: #25d366;
       color: white;
       text-align: center;
       text-decoration: none;
+      border-radius: 9px;
       font-weight: bold;
     }
 
-    .loading,
-    .empty,
-    .error {
+    .buy-button:hover {
+      background: #1ebe5d;
+    }
+
+    .message {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 30px;
+      padding: 40px 20px;
+      color: #666;
     }
 
     footer {
       text-align: center;
-      padding: 30px;
+      padding: 35px 20px;
       color: #777;
+    }
+
+    @media (max-width: 600px) {
+
+      header h1 {
+        font-size: 26px;
+      }
+
+      .products {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .product-image {
+        height: 180px;
+      }
+
+      .product-info {
+        padding: 12px;
+      }
+
+      .product-name {
+        font-size: 15px;
+      }
+
+      .price {
+        font-size: 20px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-<header>
-  <h1>🛍️ Nossalojaaqui</h1>
-  <p>Encontre ofertas e produtos selecionados</p>
-</header>
+  <header>
+    <h1>🛍️ Nossalojaaqui</h1>
+    <p>Encontre ofertas e produtos selecionados</p>
+  </header>
 
-<div class="container">
+  <main class="container">
 
-  <input
-    type="search"
-    id="search"
-    placeholder="🔎 Procurar produto..."
-  >
+    <input
+      type="search"
+      id="search"
+      class="search"
+      placeholder="🔎 Procurar produto..."
+    >
 
-  <div id="products">
-    <div class="loading">
-      Carregando produtos...
+    <div id="products" class="products">
+      <div class="message">
+        Carregando produtos...
+      </div>
     </div>
-  </div>
 
-</div>
+  </main>
 
-<footer>
-  © 2026 Nossalojaaqui
-</footer>
+  <footer>
+    © 2026 Nossalojaaqui
+  </footer>
 
-<script>
+  <script>
 
-const products = document.getElementById("products");
-const search = document.getElementById("search");
+    const productsContainer =
+      document.getElementById("products");
 
-let listaProdutos = [];
+    const search =
+      document.getElementById("search");
 
-// ==========================================
-// CARREGAR PRODUTOS
-// ==========================================
+    let produtos = [];
 
-async function carregarProdutos() {
+    async function carregarProdutos() {
 
-  try {
+      try {
 
-    const resposta = await fetch("/api/produtos");
+        const resposta =
+          await fetch("/api/produtos");
 
-    const dados = await resposta.json();
+        if (!resposta.ok) {
+          throw new Error("Erro ao consultar produtos");
+        }
 
-    if (!resposta.ok || dados.sucesso === false) {
-      throw new Error(
-        dados.erro || "Não foi possível carregar os produtos."
-      );
+        const dados =
+          await resposta.json();
+
+        console.log("Resposta da API:", dados);
+
+        if (Array.isArray(dados)) {
+          produtos = dados;
+        } else if (Array.isArray(dados.produtos)) {
+          produtos = dados.produtos;
+        } else if (Array.isArray(dados.products)) {
+          produtos = dados.products;
+        } else if (Array.isArray(dados.data)) {
+          produtos = dados.data;
+        } else {
+          produtos = [];
+        }
+
+        mostrarProdutos(produtos);
+
+      } catch (erro) {
+
+        console.error("Erro:", erro);
+
+        productsContainer.innerHTML = `
+          <div class="message">
+            ❌ Não foi possível carregar os produtos.
+          </div>
+        `;
+      }
     }
 
-    listaProdutos = dados.produtos || [];
+    function mostrarProdutos(lista) {
 
-    mostrarProdutos(listaProdutos);
+      if (!lista.length) {
 
-  } catch (erro) {
+        productsContainer.innerHTML = `
+          <div class="message">
+            Nenhum produto cadastrado.
+          </div>
+        `;
 
-    console.error(erro);
+        return;
+      }
 
-    products.innerHTML = `
-      <div class="error">
-        ❌ Não foi possível carregar os produtos.
-      </div>
-    `;
-  }
-}
+      productsContainer.innerHTML = "";
 
-// ==========================================
-// MOSTRAR PRODUTOS
-// ==========================================
+      lista.forEach(produto => {
 
-function mostrarProdutos(lista) {
+        const nome =
+          produto.name ||
+          produto.nome ||
+          "Produto";
 
-  if (!lista.length) {
+        const imagem =
+          produto.image_url ||
+          produto.image ||
+          produto.imagem ||
+          "https://via.placeholder.com/500x500?text=Produto";
 
-    products.innerHTML = `
-      <div class="empty">
-        Nenhum produto cadastrado ainda.
-      </div>
-    `;
+        const descricao =
+          produto.description ||
+          produto.descricao ||
+          "";
 
-    return;
-  }
+        const valor =
+          Number(
+            produto.price ||
+            produto.preco ||
+            0
+          );
 
-  products.innerHTML = "";
+        const preco =
+          valor.toFixed(2).replace(".", ",");
 
-  lista.forEach(produto => {
+        const link =
+          produto.shopee_url ||
+          produto.offerLink ||
+          produto.productLink ||
+          produto.url ||
+          produto.link ||
+          "#";
 
-    const card = document.createElement("div");
+        const card =
+          document.createElement("div");
 
-    card.className = "product";
+        card.className = "product";
 
-    const imagem =
-      produto.image_url ||
-      "https://via.placeholder.com/500x500?text=Produto";
+        card.innerHTML = `
 
-    const nome =
-      produto.name ||
-      "Produto";
+          <img
+            class="product-image"
+            src="${imagem}"
+            alt="${nome}"
+            onerror="this.src='https://via.placeholder.com/500x500?text=Produto'"
+          >
 
-    const preco =
-      Number(produto.price || 0)
-        .toFixed(2)
-        .replace(".", ",");
+          <div class="product-info">
 
-    const link =
-      produto.shopee_url ||
-      "#";
+            <h2 class="product-name">
+              ${nome}
+            </h2>
 
-    card.innerHTML = `
+            ${
+              descricao
+              ? `<div class="product-description">
+                   ${descricao}
+                 </div>`
+              : ""
+            }
 
-      <img
-        src="${imagem}"
-        alt="${nome}"
-        onerror="this.src='https://via.placeholder.com/500x500?text=Produto'"
-      >
+            <div class="price">
+              R$ ${preco}
+            </div>
 
-      <div class="product-info">
+            <a
+              class="buy-button"
+              href="${link}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              🛒 Comprar produto
+            </a>
 
-        <h2>${nome}</h2>
+          </div>
+        `;
 
-        <div class="price">
-          R$ ${preco}
-        </div>
+        productsContainer.appendChild(card);
 
-        <a
-          class="buy"
-          href="${link}"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          🛒 Comprar produto
-        </a>
+      });
+    }
 
-      </div>
+    search.addEventListener(
+      "input",
+      function() {
 
-    `;
+        const texto =
+          this.value
+            .toLowerCase()
+            .trim();
 
-    products.appendChild(card);
+        const filtrados =
+          produtos.filter(produto => {
 
-  });
-}
+            const nome =
+              String(
+                produto.name ||
+                produto.nome ||
+                ""
+              ).toLowerCase();
 
-// ==========================================
-// PESQUISA
-// ==========================================
+            return nome.includes(texto);
+          });
 
-search.addEventListener("input", function() {
+        mostrarProdutos(filtrados);
+      }
+    );
 
-  const texto =
-    this.value
-      .toLowerCase()
-      .trim();
+    carregarProdutos();
 
-  const filtrados =
-    listaProdutos.filter(produto => {
-
-      const nome =
-        String(produto.name || "")
-          .toLowerCase();
-
-      return nome.includes(texto);
-
-    });
-
-  mostrarProdutos(filtrados);
-
-});
-
-// ==========================================
-// INICIAR
-// ==========================================
-
-carregarProdutos();
-
-</script>
+  </script>
 
 </body>
 </html>
