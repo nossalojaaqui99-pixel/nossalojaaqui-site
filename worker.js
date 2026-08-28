@@ -691,59 +691,98 @@ if (
       );
     }
 
-    const produtoShopee = nodes[0];
+   const produtoShopee = nodes[0];
 
-    // Formato usado pelo painel admin
-    const produto = {
+// ==========================================
+// IMAGEM DO PRODUTO
+// ==========================================
 
-      nome:
-        produtoShopee.productName || "",
+let imagemProduto = produtoShopee.imageUrl || "";
 
-      preco:
-        produtoShopee.price || "",
+// Se a API não retornar imagem, tenta usar
+// uma imagem disponível no link do produto.
+if (!imagemProduto && produtoShopee.productLink) {
+  try {
+    const pagina = await fetch(produtoShopee.productLink, {
+      method: "GET",
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (compatible; Nossalojaaqui/1.0)"
+      }
+    });
 
-     imagem:
-  produtoShopee.imageUrl || null,
+    const html = await pagina.text();
 
-      descricao:
-        produtoShopee.productName || "",
+    const imagemMatch =
+      html.match(
+        /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i
+      ) ||
+      html.match(
+        /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i
+      );
 
-      categoria:
-        "Outros",
+    if (imagemMatch) {
+      imagemProduto = imagemMatch[1];
+    }
 
-      cores:
-        "",
+  } catch (erroImagem) {
+    console.log("Não foi possível obter a imagem:", erroImagem);
+  }
+}
 
-      tamanhos:
-        "",
+// ==========================================
+// FORMATO USADO PELO PAINEL ADMIN
+// ==========================================
 
-      link:
-        produtoShopee.offerLink ||
-        produtoShopee.productLink ||
-        link,
+const produto = {
 
-      shopName:
-        produtoShopee.shopName || "",
+  nome:
+    produtoShopee.productName || "",
 
-      commissionRate:
-        produtoShopee.commissionRate || "",
+  preco:
+    produtoShopee.price || "",
 
-      commission:
-        produtoShopee.commission || "",
+  imagem:
+    imagemProduto,
 
-      ratingStar:
-        produtoShopee.ratingStar || "",
+  descricao:
+    produtoShopee.productName || "",
 
-      sales:
-        produtoShopee.sales || 0,
+  categoria:
+    "Outros",
 
-      itemId:
-        produtoShopee.itemId || itemId,
+  cores:
+    "",
 
-      shopId:
-        produtoShopee.shopId || shopId
-    };
+  tamanhos:
+    "",
 
+  link:
+    produtoShopee.offerLink ||
+    produtoShopee.productLink ||
+    link,
+
+  shopName:
+    produtoShopee.shopName || "",
+
+  commissionRate:
+    produtoShopee.commissionRate || "",
+
+  commission:
+    produtoShopee.commission || "",
+
+  ratingStar:
+    produtoShopee.ratingStar || "",
+
+  sales:
+    produtoShopee.sales || 0,
+
+  itemId:
+    produtoShopee.itemId || itemId,
+
+  shopId:
+    produtoShopee.shopId || shopId
+};
     return new Response(
       JSON.stringify({
         sucesso: true,
