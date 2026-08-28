@@ -702,8 +702,8 @@ if (
       preco:
         produtoShopee.price || "",
 
-      imagem:
-        produtoShopee.imageUrl || "",
+     imagem:
+  produtoShopee.imageUrl || null,
 
       descricao:
         produtoShopee.productName || "",
