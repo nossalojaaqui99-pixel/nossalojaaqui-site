@@ -269,11 +269,12 @@
           produto.nome ||
           "Produto";
 
-        const imagem =
-          produto.image_url ||
-          produto.image ||
-          produto.imagem ||
-          "https://via.placeholder.com/500x500?text=Produto";
+      const imagem =
+  produto.image_url ||
+  produto.imageUrl ||
+  produto.image ||
+  produto.imagem ||
+  "https://via.placeholder.com/500x500?text=Produto";
 
         const descricao =
           produto.description ||
