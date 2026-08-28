@@ -402,13 +402,15 @@ async function buscarProduto() {
 
     }
 
-    if (produto.image_url) {
+    if (produto.imagem || produto.image_url) {
 
-      preview.src =
-        produto.image_url;
+  preview.src =
+    produto.imagem || produto.image_url;
 
-      preview.style.display =
-        "block";
+  preview.style.display =
+    "block";
+
+}
 
     }
 
